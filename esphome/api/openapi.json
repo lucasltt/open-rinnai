@@ -1,0 +1,2705 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Rinnai REU-E211 · API local v1",
+    "version": "1.1.0",
+    "description": "Contrato da API v1. Os endpoints básicos existem no firmware 1.1.0; GET /sessions e a capacidade completed_sessions exigem firmware 1.2.0. Confira a versão e as capacidades instaladas. API HTTP local para controle confirmado, telemetria e sincronização dos usos concluídos do adaptador ESP32. Respostas JSON, sem autenticação HTTP na rede local. POST exige JSON e corpo de até 2048 bytes; 202 indica somente aceitação. Gás/custos são estimativas. A API nativa ESPHome criptografada na porta 6053 continua sendo o caminho de controle no Home Assistant.",
+    "x-firmware-target": "1.2.0"
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "Mesmo ESP32 que hospeda esta documentação."
+    }
+  ],
+  "security": [],
+  "tags": [
+    {
+      "name": "Leitura"
+    },
+    {
+      "name": "Controle"
+    },
+    {
+      "name": "Configuração"
+    },
+    {
+      "name": "Histórico"
+    },
+    {
+      "name": "Diagnóstico"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Descobrir a API e seus recursos",
+        "description": "",
+        "tags": [
+          "Leitura"
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta atual do cache local.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capabilities"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/capabilities": {
+      "get": {
+        "summary": "Consultar capacidades e limites",
+        "description": "",
+        "tags": [
+          "Leitura"
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta atual do cache local.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capabilities"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/state": {
+      "get": {
+        "summary": "Ler o estado completo",
+        "description": "Consulta recomendada a cada 2 s. A atualização do cache é de aproximadamente 1 s; os registradores físicos têm idades distintas.",
+        "tags": [
+          "Leitura"
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta atual do cache local.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/State"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/telemetry": {
+      "get": {
+        "summary": "Ler telemetria para visor remoto",
+        "description": "Inclui atualidade das leituras e avisos ativos. Não transforma ausência de dados em zero.",
+        "tags": [
+          "Leitura"
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta atual do cache local.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Telemetry"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings": {
+      "get": {
+        "summary": "Ler tarifas, favoritos e avisos",
+        "description": "",
+        "tags": [
+          "Configuração"
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta atual do cache local.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Substituir tipo de gás e tarifas",
+        "description": "Envie os três campos. Não altera favoritos/avisos. Após 202 leia GET /settings para confirmar os valores persistidos.",
+        "tags": [
+          "Configuração"
+        ],
+        "requestBody": {
+          "required": true,
+          "x-max-content-length": 2048,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TariffRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Pedido aceito na fila; não significa conclusão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Accepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "JSON ou parâmetros inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origem de navegador não permitida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método não permitido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Tempo esgotado ao receber o corpo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Operação ocupada ou incompatível com o estado atual.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Corpo maior que 2048 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Envie Content-Type: application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/control": {
+      "get": {
+        "summary": "Acompanhar o último comando HTTP",
+        "description": "Compare boot_id e command_id com a aceitação. result=confirmed exige confirmação física; failed/uncertain não deve provocar repetição automática.",
+        "tags": [
+          "Controle"
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta atual do cache local.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Control"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/history": {
+      "get": {
+        "summary": "Ler o gráfico de 24 h e até 24 usos",
+        "description": "Consulta sugerida a cada 10 s. Os pontos de gráfico reiniciam com o módulo; usos concluídos persistem.",
+        "tags": [
+          "Histórico"
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta atual do cache local.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/History"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/periods": {
+      "get": {
+        "summary": "Ler até 31 dias e 12 meses",
+        "description": "Consulta sugerida a cada 10 s ou mais. Consulte partial e clock_valid.",
+        "tags": [
+          "Histórico"
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta atual do cache local.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Periods"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/diagnostics": {
+      "get": {
+        "summary": "Ler memória, reinícios e último crash",
+        "description": "Consulta sugerida a cada 10 s ou mais. A identificação da última falha não implica uma falha atual.",
+        "tags": [
+          "Diagnóstico"
+        ],
+        "responses": {
+          "200": {
+            "description": "Resposta atual do cache local.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Diagnostics"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Verificar disponibilidade",
+        "tags": [
+          "Diagnóstico"
+        ],
+        "responses": {
+          "200": {
+            "description": "Comunicação e armazenamento disponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Estado inicial ou degradado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Health"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/temperature": {
+      "post": {
+        "summary": "Ajustar a temperatura absoluta",
+        "description": "35 a 50 °C, em passos de 1 °C. Uma vaga de controle; ocupado retorna 409. Depois do 202 acompanhe /control. Não existe repetição automática de incremento/decremento incerto.",
+        "tags": [
+          "Controle"
+        ],
+        "requestBody": {
+          "required": true,
+          "x-max-content-length": 2048,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemperatureRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Pedido aceito na fila; não significa conclusão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptedTemperature"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "JSON ou parâmetros inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origem de navegador não permitida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método não permitido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Tempo esgotado ao receber o corpo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Operação ocupada ou incompatível com o estado atual.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Corpo maior que 2048 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Envie Content-Type: application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/favorite": {
+      "post": {
+        "summary": "Aplicar um favorito salvo",
+        "description": "slot é 1, 2 ou 3, na ordem retornada por GET /settings. Aplica a temperatura imediatamente como um pedido explícito; não é somente seleção de interface.",
+        "tags": [
+          "Controle"
+        ],
+        "requestBody": {
+          "required": true,
+          "x-max-content-length": 2048,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FavoriteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Pedido aceito na fila; não significa conclusão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptedTemperature"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "JSON ou parâmetros inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origem de navegador não permitida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método não permitido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Tempo esgotado ao receber o corpo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Operação ocupada ou incompatível com o estado atual.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Corpo maior que 2048 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Envie Content-Type: application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/preferences": {
+      "post": {
+        "summary": "Substituir os três favoritos e os avisos",
+        "description": "Envie a configuração completa. Após 202 leia GET /settings para confirmar os valores efetivamente persistidos.",
+        "tags": [
+          "Configuração"
+        ],
+        "requestBody": {
+          "required": true,
+          "x-max-content-length": 2048,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferencesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Pedido aceito na fila; não significa conclusão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Accepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "JSON ou parâmetros inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origem de navegador não permitida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método não permitido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Tempo esgotado ao receber o corpo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Operação ocupada ou incompatível com o estado atual.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Corpo maior que 2048 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Envie Content-Type: application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/control/cancel": {
+      "post": {
+        "summary": "Interromper novos passos de um ajuste",
+        "description": "Não desfaz um passo já enviado. Um resultado incerto exige nova leitura antes de outro pedido explícito.",
+        "tags": [
+          "Configuração"
+        ],
+        "requestBody": {
+          "required": true,
+          "x-max-content-length": 2048,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Pedido aceito na fila; não significa conclusão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Accepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "JSON ou parâmetros inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origem de navegador não permitida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método não permitido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Tempo esgotado ao receber o corpo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Operação ocupada ou incompatível com o estado atual.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Corpo maior que 2048 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Envie Content-Type: application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Controle já ocioso; nada precisou ser cancelado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/device/restart": {
+      "post": {
+        "summary": "Reiniciar somente o módulo ESP32",
+        "description": "Exige confirm=true e pelo menos 75 segundos desde o boot (limits.restart_min_uptime_s em GET /capabilities). Antes disso retorna 503 com code=not_ready. Após o prazo, retorna 409 com água em uso ou controle ocupado. Quando aceito, o reinício é adiado por pelo menos 500 ms para responder ao cliente. Reinicia somente o ESP32, não a placa do aquecedor.",
+        "tags": [
+          "Configuração"
+        ],
+        "requestBody": {
+          "required": true,
+          "x-max-content-length": 2048,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RestartRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Pedido aceito na fila; não significa conclusão.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Accepted"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "JSON ou parâmetros inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origem de navegador não permitida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso não encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método não permitido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Tempo esgotado ao receber o corpo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Operação ocupada ou incompatível com o estado atual.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Corpo maior que 2048 bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Envie Content-Type: application/json.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dados iniciais ou comunicação necessários indisponíveis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions": {
+      "get": {
+        "summary": "Sincronizar usos concluídos com identidade durável",
+        "description": "Disponível desde o firmware 1.2.0. Consulte a cada 10 s ou mais. Use device_id, stream_id e o id de cada registro para reconciliar os dados, sem deduplicar por horário. Atualizações SNTP podem completar datas do mesmo ID. Nenhum uso sem commit confirmado é exportado. HTTP 503 preserva o cursor do cliente. A janela finita pode perder usos se o cliente ficar desconectado por mais de 24 acionamentos; detecte lacunas de sequência e não invente os registros ausentes.",
+        "tags": [
+          "Histórico"
+        ],
+        "x-since-firmware": "1.2.0",
+        "responses": {
+          "200": {
+            "description": "Snapshot durável disponível.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionsSnapshot"
+                },
+                "example": {
+                  "api_version": "1",
+                  "schema_version": 1,
+                  "device_id": "rinnai-aabbccddeeff",
+                  "stream_id": "00112233445566778899aabbccddeeff",
+                  "firmware_version": "1.2.0",
+                  "ready": true,
+                  "storage_ok": true,
+                  "capacity": 24,
+                  "total_sessions": 128,
+                  "oldest_sequence": 128,
+                  "newest_sequence": 128,
+                  "sequence_exhausted": false,
+                  "pricing_basis": "current_settings",
+                  "settings": {
+                    "gas_type": "GN",
+                    "gas_unit": "m3",
+                    "gas_tariff": 1.69,
+                    "water_tariff": 5.63
+                  },
+                  "sessions": [
+                    {
+                      "id": "00112233445566778899aabbccddeeff:128",
+                      "sequence": 128,
+                      "started_at_epoch_s": 1793652000,
+                      "ended_at_epoch_s": 1793652480,
+                      "elapsed_s": 480,
+                      "duration_s": 472,
+                      "heating_s": 460,
+                      "water_l": 42,
+                      "energy_kwh": 0.8,
+                      "gas": 0.073182,
+                      "gas_unit": "m3",
+                      "gas_cost": 0.124,
+                      "water_cost": 0.236,
+                      "cost": 0.36,
+                      "cost_complete": true,
+                      "complete": true,
+                      "end_reason": "flow_stop"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Identidade/checkpoint ainda não confirmado, armazenamento indisponível ou inicialização pendente. Não avance o cursor.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Mensagem legível para pessoas."
+          },
+          "code": {
+            "type": "string",
+            "description": "Código estável para a integração."
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "error",
+          "code"
+        ]
+      },
+      "ReadingAge": {
+        "type": "object",
+        "properties": {
+          "age_s": {
+            "type": "number",
+            "description": "Segundos desde a resposta física aceita; null quando nunca houve resposta.",
+            "nullable": true
+          },
+          "stale": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "age_s",
+          "stale"
+        ]
+      },
+      "Readings": {
+        "type": "object",
+        "properties": {
+          "inlet": {
+            "$ref": "#/components/schemas/ReadingAge"
+          },
+          "outlet": {
+            "$ref": "#/components/schemas/ReadingAge"
+          },
+          "flow": {
+            "$ref": "#/components/schemas/ReadingAge"
+          },
+          "power": {
+            "$ref": "#/components/schemas/ReadingAge"
+          },
+          "setpoint": {
+            "$ref": "#/components/schemas/ReadingAge"
+          },
+          "flame": {
+            "$ref": "#/components/schemas/ReadingAge"
+          },
+          "error": {
+            "$ref": "#/components/schemas/ReadingAge"
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "inlet",
+          "outlet",
+          "flow",
+          "power",
+          "setpoint",
+          "flame",
+          "error"
+        ]
+      },
+      "Alert": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "warning",
+              "error"
+            ]
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "id",
+          "title",
+          "message",
+          "severity"
+        ]
+      },
+      "Favorite": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 31,
+            "pattern": "^[^\\u0000-\\u001f\\u007f]+$",
+            "description": "Até 31 bytes UTF-8 após remover espaços ASCII das extremidades. O limite de bytes pode ser menor que 31 caracteres."
+          },
+          "temp_c": {
+            "type": "integer",
+            "minimum": 35,
+            "maximum": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "temp_c"
+        ]
+      },
+      "AlertSettings": {
+        "type": "object",
+        "properties": {
+          "long_use_enabled": {
+            "type": "boolean"
+          },
+          "flow_enabled": {
+            "type": "boolean"
+          },
+          "error_enabled": {
+            "type": "boolean"
+          },
+          "offline_enabled": {
+            "type": "boolean"
+          },
+          "long_use_min": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 180
+          },
+          "continuous_flow_min": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 180
+          },
+          "offline_seconds": {
+            "type": "integer",
+            "minimum": 10,
+            "maximum": 600
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "long_use_enabled",
+          "flow_enabled",
+          "error_enabled",
+          "offline_enabled",
+          "long_use_min",
+          "continuous_flow_min",
+          "offline_seconds"
+        ]
+      },
+      "TariffRequest": {
+        "type": "object",
+        "properties": {
+          "gas_type": {
+            "type": "string",
+            "enum": [
+              "GN",
+              "GLP"
+            ]
+          },
+          "gas_tariff": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000,
+            "description": "R$/m³ para GN; R$/kg para GLP. Zero significa tarifa não informada."
+          },
+          "water_tariff": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000,
+            "description": "R$/m³; zero significa tarifa não informada."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "gas_type",
+          "gas_tariff",
+          "water_tariff"
+        ]
+      },
+      "PreferencesRequest": {
+        "type": "object",
+        "properties": {
+          "favorites": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Favorite"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "alerts": {
+            "$ref": "#/components/schemas/AlertSettings"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "favorites",
+          "alerts"
+        ]
+      },
+      "Settings": {
+        "type": "object",
+        "properties": {
+          "gas_type": {
+            "type": "string",
+            "enum": [
+              "GN",
+              "GLP"
+            ]
+          },
+          "gas_tariff": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000,
+            "description": "R$/m³ para GN; R$/kg para GLP. Zero significa tarifa não informada."
+          },
+          "water_tariff": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000,
+            "description": "R$/m³; zero significa tarifa não informada."
+          },
+          "gas_unit": {
+            "type": "string",
+            "enum": [
+              "m3",
+              "kg"
+            ]
+          },
+          "favorites": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Favorite"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "alerts": {
+            "$ref": "#/components/schemas/AlertSettings"
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "gas_type",
+          "gas_tariff",
+          "water_tariff",
+          "gas_unit",
+          "favorites",
+          "alerts"
+        ]
+      },
+      "Accounting": {
+        "type": "object",
+        "properties": {
+          "water_l": {
+            "type": "number",
+            "description": "Litros de água estimados."
+          },
+          "energy_kwh": {
+            "type": "number",
+            "description": "Energia térmica estimada em kWh."
+          },
+          "gas": {
+            "type": "number",
+            "description": "GN em m³ ou GLP em kg, conforme settings.gas_unit."
+          },
+          "cost": {
+            "type": "number",
+            "description": "Soma em R$ das parcelas gas_cost e water_cost disponíveis; null quando nenhuma tarifa está informada. Usa tarifas atuais.",
+            "nullable": true
+          },
+          "cost_complete": {
+            "type": "boolean",
+            "description": "Verdadeiro somente quando as duas parcelas possuem tarifas e estimativas válidas."
+          },
+          "gas_cost": {
+            "type": "number",
+            "description": "Parcela estimada de gás em R$ usando a tarifa atual; null quando gas_tariff é zero (não informada).",
+            "nullable": true
+          },
+          "water_cost": {
+            "type": "number",
+            "description": "Parcela estimada de água em R$ usando a tarifa atual; null quando water_tariff é zero (não informada).",
+            "nullable": true
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "water_l",
+          "energy_kwh",
+          "gas",
+          "cost",
+          "cost_complete",
+          "gas_cost",
+          "water_cost"
+        ]
+      },
+      "PeriodBucket": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Accounting"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "heating_s": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sessions": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "partial": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": true,
+            "required": [
+              "key",
+              "heating_s",
+              "sessions",
+              "partial"
+            ]
+          }
+        ]
+      },
+      "Session": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Accounting"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "sequence": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "complete": {
+                "type": "boolean"
+              },
+              "duration_s": {
+                "type": "number",
+                "description": "Tempo acompanhado com leituras válidas; pode ser menor que o tempo transcorrido."
+              },
+              "elapsed_s": {
+                "type": "number",
+                "description": "Tempo transcorrido desde o início observado.",
+                "nullable": true
+              },
+              "heating_s": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "started_at_epoch_s": {
+                "type": "integer",
+                "minimum": 0,
+                "nullable": true
+              },
+              "end_reason": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true,
+            "required": [
+              "active",
+              "complete",
+              "duration_s",
+              "heating_s"
+            ]
+          }
+        ]
+      },
+      "Control": {
+        "type": "object",
+        "properties": {
+          "api_version": {
+            "type": "string",
+            "enum": [
+              "1"
+            ]
+          },
+          "boot_id": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "command_id": {
+            "type": "integer",
+            "minimum": 1,
+            "nullable": true
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "queued",
+              "running",
+              "confirmed",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "target_c": {
+            "type": "integer",
+            "minimum": 35,
+            "maximum": 50,
+            "nullable": true
+          },
+          "setpoint_c": {
+            "type": "integer",
+            "minimum": 35,
+            "maximum": 50,
+            "nullable": true,
+            "description": "Última temperatura confirmada; pode ser histórica. Verifique a atualidade em GET /state ou GET /telemetry."
+          },
+          "busy": {
+            "type": "boolean",
+            "description": "Canal de controle ocupado, incluindo operacoes HTTP, API nativa e reserva da fila."
+          },
+          "ready": {
+            "type": "boolean",
+            "description": "Indica se o canal pode aceitar outro ajuste agora."
+          },
+          "uncertain": {
+            "type": "boolean",
+            "description": "O controlador atual pode ter enviado um passo sem confirmacao; nao reenvie passos relativos."
+          },
+          "confirmed_steps": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Passos confirmados pelo controlador atual. Use result e o par boot_id/command_id para concluir um comando HTTP."
+          },
+          "status": {
+            "type": "string",
+            "description": "Mensagem humana; use result para lógica de integração."
+          },
+          "accepted_at_uptime_s": {
+            "type": "number",
+            "description": "Uptime de aceitação do último comando HTTP, ou null.",
+            "nullable": true
+          },
+          "updated_at_uptime_s": {
+            "type": "number",
+            "description": "Uptime da última atualização desse comando, ou null.",
+            "nullable": true
+          },
+          "cancel_requested": {
+            "type": "boolean",
+            "description": "Cancelamento solicitado, ainda aguardando processamento no loop principal."
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "api_version",
+          "boot_id",
+          "command_id",
+          "result",
+          "target_c",
+          "setpoint_c",
+          "busy",
+          "ready",
+          "uncertain",
+          "confirmed_steps",
+          "status",
+          "accepted_at_uptime_s",
+          "updated_at_uptime_s",
+          "cancel_requested"
+        ],
+        "description": "Somente o último comando HTTP é mantido. Identifique-o pelo par boot_id + command_id. Após reinício, não existe histórico de comandos."
+      },
+      "Telemetry": {
+        "type": "object",
+        "properties": {
+          "api_version": {
+            "type": "string",
+            "enum": [
+              "1"
+            ]
+          },
+          "online": {
+            "type": "boolean"
+          },
+          "heating": {
+            "type": "boolean"
+          },
+          "inlet_c": {
+            "type": "number",
+            "description": "Temperatura de entrada em °C.",
+            "nullable": true
+          },
+          "outlet_c": {
+            "type": "number",
+            "description": "Temperatura de saída em °C.",
+            "nullable": true
+          },
+          "flow_l_min": {
+            "type": "number",
+            "description": "Vazão em L/min.",
+            "nullable": true
+          },
+          "power_kcal_min": {
+            "type": "number",
+            "description": "Potência informada em kcal/min.",
+            "nullable": true
+          },
+          "power_kw": {
+            "type": "number",
+            "description": "Potência convertida em kW.",
+            "nullable": true
+          },
+          "setpoint_c": {
+            "type": "integer",
+            "minimum": 35,
+            "maximum": 50,
+            "nullable": true,
+            "description": "Temperatura confirmada em °C, ou null quando a leitura está vencida (readings.setpoint.stale=true)."
+          },
+          "target_c": {
+            "type": "integer",
+            "minimum": 35,
+            "maximum": 50,
+            "nullable": true
+          },
+          "readings": {
+            "$ref": "#/components/schemas/Readings"
+          },
+          "alerts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Alert"
+            }
+          },
+          "error_code": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true
+          },
+          "sampled_at_epoch_s": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true
+          },
+          "sampled_at_uptime_s": {
+            "type": "number",
+            "description": "Uptime da atualização do cache, não uma amostra simultânea dos registradores físicos."
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "api_version",
+          "online",
+          "heating",
+          "inlet_c",
+          "outlet_c",
+          "flow_l_min",
+          "power_kcal_min",
+          "power_kw",
+          "setpoint_c",
+          "target_c",
+          "readings",
+          "alerts",
+          "error_code",
+          "sampled_at_epoch_s",
+          "sampled_at_uptime_s"
+        ],
+        "description": "Use online e readings.*.stale/age_s para decidir se os números são atuais. Um setpoint numérico pode permanecer após vencer."
+      },
+      "State": {
+        "type": "object",
+        "properties": {
+          "online": {
+            "type": "boolean"
+          },
+          "heating": {
+            "type": "boolean"
+          },
+          "inlet_c": {
+            "type": "number",
+            "description": "Temperatura de entrada em °C.",
+            "nullable": true
+          },
+          "outlet_c": {
+            "type": "number",
+            "description": "Temperatura de saída em °C.",
+            "nullable": true
+          },
+          "flow_l_min": {
+            "type": "number",
+            "description": "Vazão em L/min.",
+            "nullable": true
+          },
+          "power_kcal_min": {
+            "type": "number",
+            "description": "Potência informada em kcal/min.",
+            "nullable": true
+          },
+          "power_kw": {
+            "type": "number",
+            "description": "Potência convertida em kW.",
+            "nullable": true
+          },
+          "setpoint_c": {
+            "type": "integer",
+            "minimum": 35,
+            "maximum": 50,
+            "nullable": true,
+            "description": "Última temperatura confirmada em °C; pode ser histórica. Verifique online e readings.setpoint.stale."
+          },
+          "target_c": {
+            "type": "integer",
+            "minimum": 35,
+            "maximum": 50,
+            "nullable": true
+          },
+          "readings": {
+            "$ref": "#/components/schemas/Readings"
+          },
+          "alerts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Alert"
+            }
+          },
+          "version": {
+            "type": "string"
+          },
+          "control": {
+            "$ref": "#/components/schemas/Control"
+          },
+          "session": {
+            "$ref": "#/components/schemas/Session"
+          },
+          "totals": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Accounting"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "heating_s": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "sessions": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "additionalProperties": true,
+                "required": [
+                  "heating_s",
+                  "sessions"
+                ]
+              }
+            ]
+          },
+          "settings": {
+            "$ref": "#/components/schemas/Settings"
+          },
+          "periods": {
+            "type": "object",
+            "properties": {
+              "clock_valid": {
+                "type": "boolean"
+              },
+              "tracked_since_epoch_s": {
+                "type": "integer",
+                "minimum": 0,
+                "nullable": true
+              },
+              "today": {
+                "$ref": "#/components/schemas/PeriodBucket"
+              },
+              "month": {
+                "$ref": "#/components/schemas/PeriodBucket"
+              },
+              "unassigned": {
+                "$ref": "#/components/schemas/Accounting"
+              }
+            },
+            "additionalProperties": true
+          },
+          "diag": {
+            "type": "object",
+            "properties": {
+              "uptime_s": {
+                "type": "number"
+              },
+              "error_code": {
+                "type": "integer",
+                "minimum": 0,
+                "nullable": true
+              },
+              "storage_ok": {
+                "type": "boolean"
+              },
+              "boot_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "crash_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "clock_synchronized": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "version",
+          "online",
+          "heating",
+          "inlet_c",
+          "outlet_c",
+          "flow_l_min",
+          "power_kw",
+          "setpoint_c",
+          "target_c",
+          "control",
+          "session",
+          "totals",
+          "settings",
+          "periods",
+          "readings",
+          "alerts",
+          "diag"
+        ]
+      },
+      "CompletedSession": {
+        "type": "object",
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "age_s": {
+            "type": "number",
+            "description": "Idade desde o término.",
+            "nullable": true
+          },
+          "started_at_epoch_s": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true
+          },
+          "ended_at_epoch_s": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true
+          },
+          "elapsed_s": {
+            "type": "number",
+            "description": "Tempo transcorrido; null para registros antigos sem início conhecido.",
+            "nullable": true
+          },
+          "duration_s": {
+            "type": "number"
+          },
+          "water_l": {
+            "type": "number"
+          },
+          "energy_kwh": {
+            "type": "number"
+          },
+          "gas": {
+            "type": "number"
+          },
+          "cost": {
+            "type": "number",
+            "description": "R$; tarifas atuais.",
+            "nullable": true
+          },
+          "complete": {
+            "type": "boolean"
+          },
+          "end_reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "sequence",
+          "started_at_epoch_s",
+          "ended_at_epoch_s",
+          "elapsed_s",
+          "duration_s",
+          "water_l",
+          "energy_kwh",
+          "gas",
+          "cost",
+          "complete",
+          "end_reason"
+        ]
+      },
+      "History": {
+        "type": "object",
+        "properties": {
+          "samples": {
+            "type": "array",
+            "maxItems": 720,
+            "items": {
+              "type": "array",
+              "minItems": 6,
+              "maxItems": 6,
+              "items": {
+                "type": "number",
+                "nullable": true
+              }
+            },
+            "description": "Linhas numéricas na ordem indicada por sample_columns; chama é 0, 1 ou null."
+          },
+          "sample_columns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "age_s",
+              "inlet_c",
+              "outlet_c",
+              "flow_l_min",
+              "power_kw",
+              "heating"
+            ]
+          },
+          "sessions": {
+            "type": "array",
+            "maxItems": 24,
+            "items": {
+              "$ref": "#/components/schemas/CompletedSession"
+            },
+            "description": "Mais recentes primeiro; os registros persistem após reinício."
+          },
+          "points_ram_only": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "sessions_persisted": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "window_s": {
+            "type": "integer",
+            "enum": [
+              86400
+            ]
+          },
+          "point_interval_s": {
+            "type": "integer",
+            "enum": [
+              120
+            ]
+          },
+          "session_capacity": {
+            "type": "integer",
+            "enum": [
+              24
+            ]
+          },
+          "total_sessions": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ram_only": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "samples",
+          "sample_columns",
+          "sessions",
+          "points_ram_only",
+          "sessions_persisted",
+          "window_s",
+          "point_interval_s",
+          "session_capacity",
+          "total_sessions"
+        ],
+        "description": "Os pontos de gráfico ficam em RAM e não são reconstruídos após reinício. Cada bin de 120 s guarda picos de vazão/potência, chama observada e últimas temperaturas válidas."
+      },
+      "Periods": {
+        "type": "object",
+        "properties": {
+          "clock_valid": {
+            "type": "boolean"
+          },
+          "tracked_since_epoch_s": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true
+          },
+          "days": {
+            "type": "array",
+            "maxItems": 31,
+            "items": {
+              "$ref": "#/components/schemas/PeriodBucket"
+            }
+          },
+          "months": {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "$ref": "#/components/schemas/PeriodBucket"
+            }
+          },
+          "unassigned": {
+            "type": "object",
+            "properties": {
+              "water_l": {
+                "type": "number"
+              },
+              "energy_kwh": {
+                "type": "number"
+              },
+              "heating_s": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "sessions": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": true,
+            "required": [
+              "water_l",
+              "energy_kwh",
+              "heating_s",
+              "sessions"
+            ]
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "clock_valid",
+          "tracked_since_epoch_s",
+          "days",
+          "months",
+          "unassigned"
+        ],
+        "description": "Datas de Brasília (UTC−3). key é YYYYMMDD para dias e YYYYMM para meses. partial indica cobertura incompleta; acumulados antigos não foram distribuídos retroativamente."
+      },
+      "Diagnostics": {
+        "type": "object",
+        "properties": {
+          "boot_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "crash_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "last_reset_reason": {
+            "type": "string"
+          },
+          "clock_valid": {
+            "type": "boolean"
+          },
+          "storage_ok": {
+            "type": "boolean"
+          },
+          "firmware_elf_sha256": {
+            "type": "string"
+          },
+          "heap_free_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "heap_largest_block_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "boots": {
+            "type": "array",
+            "maxItems": 12,
+            "items": {
+              "type": "object",
+              "properties": {
+                "sequence": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "epoch_s": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "nullable": true
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "reason_code": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "crash": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "crash_log": {
+            "type": "string"
+          },
+          "crash_firmware_elf_sha256": {
+            "type": "string"
+          },
+          "crash_firmware_version": {
+            "type": "string"
+          },
+          "crash_log_truncated": {
+            "type": "boolean"
+          },
+          "crash_record_boot": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "error_code": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Código de erro recente do aquecedor, ou null quando desconhecido."
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "boot_count",
+          "crash_count",
+          "last_reset_reason",
+          "clock_valid",
+          "storage_ok",
+          "firmware_elf_sha256",
+          "boots",
+          "crash_log"
+        ]
+      },
+      "Health": {
+        "type": "object",
+        "properties": {
+          "api_version": {
+            "type": "string",
+            "enum": [
+              "1"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "degraded",
+              "starting"
+            ]
+          },
+          "online": {
+            "type": "boolean"
+          },
+          "storage_ok": {
+            "type": "boolean"
+          },
+          "uptime_s": {
+            "type": "number"
+          },
+          "version": {
+            "type": "string"
+          },
+          "boot_id": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "api_version",
+          "status",
+          "online",
+          "storage_ok",
+          "uptime_s",
+          "version",
+          "boot_id"
+        ]
+      },
+      "Capabilities": {
+        "type": "object",
+        "properties": {
+          "api_version": {
+            "type": "string",
+            "enum": [
+              "1"
+            ]
+          },
+          "limits": {
+            "type": "object",
+            "properties": {
+              "restart_min_uptime_s": {
+                "type": "integer",
+                "minimum": 0,
+                "example": 75,
+                "description": "Uptime mínimo em segundos para aceitar POST /device/restart."
+              }
+            },
+            "additionalProperties": true
+          },
+          "capabilities": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "completed_sessions": {
+                "type": "boolean",
+                "description": "GET /sessions e identidade durável disponíveis."
+              }
+            }
+          },
+          "endpoints": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "sessions": {
+                "type": "string",
+                "example": "/api/v1/sessions"
+              }
+            }
+          },
+          "recommended_poll_s": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "sessions": {
+                "type": "integer",
+                "minimum": 10,
+                "example": 10
+              }
+            }
+          }
+        },
+        "additionalProperties": true,
+        "description": "Índice de recursos, links, faixa de temperatura, unidades, limites e intervalos sugeridos de consulta. Informa como não suportados liga/desliga e comandos seriais arbitrários; consulte os valores retornados pelo firmware."
+      },
+      "Accepted": {
+        "type": "object",
+        "properties": {
+          "accepted": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "status_url": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "accepted",
+          "status_url"
+        ]
+      },
+      "AcceptedTemperature": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Accepted"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "boot_id": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "command_id": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "target": {
+                "type": "integer",
+                "minimum": 35,
+                "maximum": 50
+              }
+            },
+            "additionalProperties": true,
+            "required": [
+              "boot_id",
+              "command_id",
+              "target"
+            ]
+          }
+        ]
+      },
+      "TemperatureRequest": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "integer",
+            "minimum": 35,
+            "maximum": 50
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "target"
+        ]
+      },
+      "FavoriteRequest": {
+        "type": "object",
+        "properties": {
+          "slot": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "slot"
+        ]
+      },
+      "CancelRequest": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "RestartRequest": {
+        "type": "object",
+        "properties": {
+          "confirm": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "confirm"
+        ]
+      },
+      "SessionPricing": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "gas_type": {
+            "type": "string",
+            "enum": [
+              "GN",
+              "GLP"
+            ]
+          },
+          "gas_unit": {
+            "type": "string",
+            "enum": [
+              "m3",
+              "kg"
+            ]
+          },
+          "gas_tariff": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000,
+            "description": "Tarifa atual em R$/m³ para GN ou R$/kg para GLP; zero significa não informada."
+          },
+          "water_tariff": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000,
+            "description": "Tarifa atual em R$/m³; zero significa não informada."
+          }
+        },
+        "required": [
+          "gas_type",
+          "gas_unit",
+          "gas_tariff",
+          "water_tariff"
+        ]
+      },
+      "DurableSession": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Uso concluído com ID independente de horário e tarifa. Quantidades e tempos observados provêm do arquivo persistido; datas podem ganhar metadados quando o relógio sincroniza. As estimativas de gás/custo são reavaliadas com settings atuais nesta resposta.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}:[1-9][0-9]{0,9}$",
+            "description": "Identidade estável stream_id:sequence; não reconstruir por timestamps."
+          },
+          "sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "started_at_epoch_s": {
+            "type": "integer",
+            "minimum": 1577836800,
+            "description": "Início observado, em segundos Unix UTC; null se desconhecido.",
+            "nullable": true
+          },
+          "ended_at_epoch_s": {
+            "type": "integer",
+            "minimum": 1577836800,
+            "description": "Fim observado, em segundos Unix UTC; null se desconhecido.",
+            "nullable": true
+          },
+          "elapsed_s": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Tempo entre início/fim conhecidos; null se um horário está indisponível.",
+            "nullable": true
+          },
+          "duration_s": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Tempo acompanhado com leituras válidas; não é um início inferido."
+          },
+          "heating_s": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Tempo acompanhado aquecendo, em segundos."
+          },
+          "water_l": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Água estimada em litros."
+          },
+          "energy_kwh": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Energia estimada em kWh."
+          },
+          "gas": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Gás estimado usando settings atuais, na unidade de gas_unit."
+          },
+          "gas_unit": {
+            "type": "string",
+            "enum": [
+              "m3",
+              "kg"
+            ]
+          },
+          "gas_cost": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Custo estimado de gás em R$; null sem tarifa.",
+            "nullable": true
+          },
+          "water_cost": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Custo estimado de água em R$; null sem tarifa.",
+            "nullable": true
+          },
+          "cost": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Soma das parcelas disponíveis em R$; null sem nenhuma tarifa.",
+            "nullable": true
+          },
+          "cost_complete": {
+            "type": "boolean",
+            "description": "Ambas as parcelas têm tarifa/estimativa válida."
+          },
+          "complete": {
+            "type": "boolean",
+            "description": "Cobertura do acompanhamento considerada completa pelo firmware."
+          },
+          "end_reason": {
+            "type": "string",
+            "description": "Motivo de término observado, por exemplo flow_stop, stale_flow ou integration_gap."
+          }
+        },
+        "required": [
+          "id",
+          "sequence",
+          "started_at_epoch_s",
+          "ended_at_epoch_s",
+          "elapsed_s",
+          "duration_s",
+          "heating_s",
+          "water_l",
+          "energy_kwh",
+          "gas",
+          "gas_unit",
+          "gas_cost",
+          "water_cost",
+          "cost",
+          "cost_complete",
+          "complete",
+          "end_reason"
+        ]
+      },
+      "SessionsSnapshot": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "Snapshot compacto, sem os 720 pontos de gráfico. Exporta somente o último checkpoint V4 cuja gravação/sync na flash foi confirmada. Os registros estão em ordem crescente de sequência. A capacidade 24 é buffer de recuperação, não o arquivo permanente do cliente.",
+        "properties": {
+          "api_version": {
+            "type": "string",
+            "enum": [
+              "1"
+            ]
+          },
+          "schema_version": {
+            "type": "integer",
+            "enum": [
+              1
+            ]
+          },
+          "device_id": {
+            "type": "string",
+            "pattern": "^rinnai-[0-9a-f]{12}$",
+            "description": "Identidade do ESP; uma troca de dispositivo requer nova entrada de integração."
+          },
+          "stream_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$",
+            "description": "Identidade persistida da série histórica. Muda após perda/reset dessa identidade; não muda em OTA normal ou ajuste do relógio."
+          },
+          "firmware_version": {
+            "type": "string",
+            "example": "1.2.0"
+          },
+          "ready": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "storage_ok": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "capacity": {
+            "type": "integer",
+            "enum": [
+              24
+            ]
+          },
+          "total_sessions": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295,
+            "description": "Contador persistido de usos concluídos desta série; não é a quantidade de linhas disponíveis."
+          },
+          "oldest_sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Menor sequência no snapshot; null quando sessions está vazio.",
+            "nullable": true
+          },
+          "newest_sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Maior sequência no snapshot; null quando sessions está vazio.",
+            "nullable": true
+          },
+          "sequence_exhausted": {
+            "type": "boolean",
+            "description": "Contador uint32 chegou ao limite; o cliente deve sinalizar o esgotamento, sem supor novos IDs."
+          },
+          "pricing_basis": {
+            "type": "string",
+            "enum": [
+              "current_settings"
+            ],
+            "description": "As tarifas da resposta são as atuais. Um arquivo histórico deve conservar a base de preço usada na importação."
+          },
+          "settings": {
+            "$ref": "#/components/schemas/SessionPricing"
+          },
+          "sessions": {
+            "type": "array",
+            "maxItems": 24,
+            "items": {
+              "$ref": "#/components/schemas/DurableSession"
+            },
+            "description": "Ordem crescente de sequence. Datas ou cobertura podem atualizar o mesmo ID em sincronizações posteriores."
+          }
+        },
+        "required": [
+          "api_version",
+          "schema_version",
+          "device_id",
+          "stream_id",
+          "firmware_version",
+          "ready",
+          "storage_ok",
+          "capacity",
+          "total_sessions",
+          "oldest_sequence",
+          "newest_sequence",
+          "sequence_exhausted",
+          "pricing_basis",
+          "settings",
+          "sessions"
+        ]
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Guia local de integração",
+    "url": "http://192.168.1.50/api/docs"
+  }
+}

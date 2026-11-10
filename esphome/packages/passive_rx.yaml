@@ -1,0 +1,60 @@
+# RX-only capture package. The wrapper must supply both GPIO substitutions.
+# Connect the two candidate signal lines only through the verified level shifter.
+# No heater power connection, TX pin, polling, or transmission is configured here.
+
+logger:
+  # UART0 is the USB bridge only (GPIO1/GPIO3), never a heater connection.
+  baud_rate: 115200
+  hardware_uart: UART0
+  level: DEBUG
+  tx_buffer_size: 1024
+
+globals:
+  # Raw byte counters since boot; floating/unconnected pins may collect noise.
+  - id: rinnai_p1_bytes_since_boot
+    type: uint32_t
+    restore_value: false
+    initial_value: '0'
+  - id: rinnai_p2_bytes_since_boot
+    type: uint32_t
+    restore_value: false
+    initial_value: '0'
+
+uart:
+  - id: rinnai_pin1_rx
+    rx_pin: ${pin1_rx_gpio}
+    baud_rate: 9600
+    data_bits: 8
+    parity: NONE
+    stop_bits: 1
+    debug:
+      direction: RX
+      dummy_receiver: true
+      after:
+        bytes: 32
+        timeout: 20ms
+      sequence:
+        - lambda: |-
+            id(rinnai_p1_bytes_since_boot) += static_cast<uint32_t>(bytes.size());
+            const auto hex = format_hex_pretty(bytes, ' ', false);
+            id(rinnai_p1_last_block).publish_state(hex);
+            ESP_LOGD("rinnai.p1", "RX %s", hex.c_str());
+
+  - id: rinnai_pin2_rx
+    rx_pin: ${pin2_rx_gpio}
+    baud_rate: 9600
+    data_bits: 8
+    parity: NONE
+    stop_bits: 1
+    debug:
+      direction: RX
+      dummy_receiver: true
+      after:
+        bytes: 32
+        timeout: 20ms
+      sequence:
+        - lambda: |-
+            id(rinnai_p2_bytes_since_boot) += static_cast<uint32_t>(bytes.size());
+            const auto hex = format_hex_pretty(bytes, ' ', false);
+            id(rinnai_p2_last_block).publish_state(hex);
+            ESP_LOGD("rinnai.p2", "RX %s", hex.c_str());

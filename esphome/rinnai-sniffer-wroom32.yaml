@@ -1,0 +1,67 @@
+# ESP32-WROOM-32 DevKit, two receive-only channels through a 5V/3.3V converter.
+# Firmware for observation only. No heater TX line or command is configured.
+substitutions:
+  pin1_rx_gpio: GPIO25
+  pin2_rx_gpio: GPIO26
+
+esphome:
+  name: rinnai-sniffer
+  friendly_name: Rinnai Sniffer
+  comment: Escuta de dois pinos com diagnosticos e atualizacao Wi-Fi.
+  project:
+    name: lucas.rinnai-sniffer
+    version: 0.3.2
+  includes:
+    - line_diagnostics.h
+    - rx_controls.h
+    - rx_selftest.h
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+packages:
+  passive_rx: !include packages/passive_rx.yaml
+  diagnostics: !include packages/diagnostics.yaml
+  line_diagnostics: !include packages/line_diagnostics.yaml
+
+# Standalone access point; no home Wi-Fi credentials are required.
+wifi:
+  ap:
+    ssid: Rinnai Sniffer
+    password: !secret sniffer_ap_password
+    ap_timeout: 60s
+    manual_ip:
+      static_ip: 192.168.4.1
+      gateway: 192.168.4.1
+      subnet: 255.255.255.0
+  reboot_timeout: 0s
+  power_save_mode: none
+
+# Provision home Wi-Fi through the device; leave STA credentials out of this YAML.
+# ESPHome stores the chosen network in NVS and retains it across normal OTA updates.
+captive_portal:
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+  reboot_timeout: 0s
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+  - platform: web_server
+    id: rinnai_web_ota
+
+safe_mode:
+
+# Assets are embedded so the log viewer works without Internet.
+web_server:
+  port: 80
+  version: 3
+  local: true
+  log: true
+  auth:
+    username: !secret web_username
+    password: !secret web_password

@@ -1,0 +1,11 @@
+{
+  "domain": "rinnai_local",
+  "name": "Rinnai Local",
+  "version": "1.0.0",
+  "config_flow": true,
+  "documentation": "https://esphome.io/components/api/",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "requirements": [],
+  "codeowners": []
+}

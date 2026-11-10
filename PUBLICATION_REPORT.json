@@ -1,0 +1,563 @@
+{
+  "schema_version": 1,
+  "passed": true,
+  "source_files": 109,
+  "source_bytes": 2177509,
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 1182,
+      "sha256": "2abeab46d59003ac894e30aa9ca320f09f26b33b4f6ad3088a8f58aebf44e96e"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1070,
+      "sha256": "e204eba7bc37f6150eff8809b96d5edc1690fda512dec9d563e54fcca6550cfd"
+    },
+    {
+      "path": "README.md",
+      "bytes": 36701,
+      "sha256": "05c07480d15536b3cb4a19e715ef71ad9cc1ccf5a977cf4d3437d0b2873dd077"
+    },
+    {
+      "path": "analysis/build_pwa_assets.py",
+      "bytes": 20177,
+      "sha256": "00dbed39010d7b9a758d0272ffc41cbba3c952d9a2b4a55385571369b268dc37"
+    },
+    {
+      "path": "analysis/check_api_v1_http.py",
+      "bytes": 11972,
+      "sha256": "317c4d3aa7aba06f2ce3d79c5cc32b42cb7c775e2fb3a6b74303d005b9e6fc4e"
+    },
+    {
+      "path": "analysis/check_sessions_http.py",
+      "bytes": 5021,
+      "sha256": "23522265528dd47a9296d700516535706656727fa594252f152767a424696ac5"
+    },
+    {
+      "path": "analysis/create_secrets.py",
+      "bytes": 1315,
+      "sha256": "bae5424f22c294599b34933e398f1263c37fd84217077e157e3883ca0496b060"
+    },
+    {
+      "path": "analysis/embed_api_assets.py",
+      "bytes": 4876,
+      "sha256": "380e4f4282e0080758d6c6e30d236733af2af09f1bcf460d442ec4519961c683"
+    },
+    {
+      "path": "analysis/embed_pwa_assets.py",
+      "bytes": 2521,
+      "sha256": "9ae56d8121a6f86510db1ca4a899fb57b83ead8d637bfd8490a3f14a70d59014"
+    },
+    {
+      "path": "analysis/export_github.py",
+      "bytes": 13996,
+      "sha256": "34d30b4bf26ab0419611f45f91b817b81c059a6574323141bf9f2188ad63e57a"
+    },
+    {
+      "path": "analysis/protocol_inspector.py",
+      "bytes": 6773,
+      "sha256": "df1648000cd170eb06d2fc493591dd4c51d927c0fb9dcf36e275f60ba550ae62"
+    },
+    {
+      "path": "analysis/run_api_backend_test.py",
+      "bytes": 2749,
+      "sha256": "024fa8a1dafde47f8aac3e666388d1e070b066e42d59bd4faf06d089b93efe6f"
+    },
+    {
+      "path": "analysis/stubs/esphome/core/hal.h",
+      "bytes": 159,
+      "sha256": "b4d5969b2b5ff665950b73e5c635188df81f5637074ac57ca913a0c7d071bcaf"
+    },
+    {
+      "path": "analysis/stubs/esphome/core/helpers.h",
+      "bytes": 564,
+      "sha256": "e0b595b58763a87967cd75f5c64c6a8f24355ec4a1d2eeec45577329eae280fa"
+    },
+    {
+      "path": "analysis/stubs/esphome/core/preferences.h",
+      "bytes": 2460,
+      "sha256": "e93691f1b19dcd3652fe1f1840cb18a0fa27f444c724227b5a66514cad4f29fe"
+    },
+    {
+      "path": "analysis/test_api_backend.cpp",
+      "bytes": 33607,
+      "sha256": "8ab3dd551d67ac31be634e531657fae89b18a791c39cbc95b86225a083dc8842"
+    },
+    {
+      "path": "analysis/test_api_command.cpp",
+      "bytes": 4033,
+      "sha256": "2d68e328ff095dc4cc88cf878d59b71785779bd6bf0b4f7c57b680e46a897cba"
+    },
+    {
+      "path": "analysis/test_api_requests.cpp",
+      "bytes": 10222,
+      "sha256": "44073540f20c2a6291fb36196a2f536be06a9eea61cc4a58d9294bd0d1f71862"
+    },
+    {
+      "path": "analysis/test_dashboard_history_json.cpp",
+      "bytes": 6176,
+      "sha256": "331bb752ab39470812aa151b0c1307b6c5b79d7dfa008d7e92c9abae45c7b59e"
+    },
+    {
+      "path": "analysis/test_heater_control.cpp",
+      "bytes": 9276,
+      "sha256": "aead667bf4b161771dae8ff6a595fc594d7c62b11d9330f965df623f7acd965e"
+    },
+    {
+      "path": "analysis/test_heater_health.cpp",
+      "bytes": 10873,
+      "sha256": "85142f5be029b1bc7bd416bb9903243c079474a1cee2558dcf90da722f4602de"
+    },
+    {
+      "path": "analysis/test_heater_history.cpp",
+      "bytes": 10555,
+      "sha256": "72bdc86629bb8f2f0930424738ab41ba159489adf006d56d8e46e93585578fa9"
+    },
+    {
+      "path": "analysis/test_heater_periods.cpp",
+      "bytes": 11244,
+      "sha256": "bb1fdaa960a8d7e670784221d0dfef7bef224bd222ebd6b8e0e407f8d7223b07"
+    },
+    {
+      "path": "analysis/test_heater_stats.cpp",
+      "bytes": 14327,
+      "sha256": "e4946c010944bb98a86ed430f73fd41c2c3fef433aecf3d89e0e44bdc66c52be"
+    },
+    {
+      "path": "analysis/test_heater_storage.cpp",
+      "bytes": 35194,
+      "sha256": "afff65772138ad297950f7ec5f6cb5a5b5506d113ae847626e298c8edf54d97a"
+    },
+    {
+      "path": "analysis/test_protocol_inspector.py",
+      "bytes": 5181,
+      "sha256": "3f16827bda9cc7cb0a744127a0bd9b3a01d7f35ccae9c791dd8d9c0b09339568"
+    },
+    {
+      "path": "analysis/test_rinnai_telemetry.cpp",
+      "bytes": 8728,
+      "sha256": "de46137b8e6753b262eac5a9a87af62eecf5d96bf6c5cef34b5f6c30d736c1c3"
+    },
+    {
+      "path": "analysis/test_sessions_json.cpp",
+      "bytes": 7876,
+      "sha256": "55c9d00885fde3af6a122daf3de477999b0af71304a0ad1675c663305275761e"
+    },
+    {
+      "path": "analysis/test_smart_settings.cpp",
+      "bytes": 8384,
+      "sha256": "177d03ea088fb3303040e4e9a067257cf05fd3d94ea1fa9ebb61eff3f8a8d758"
+    },
+    {
+      "path": "docs/HARDWARE.md",
+      "bytes": 6642,
+      "sha256": "d26dd27e39070a6d6dc614616fcbe9ef3095c675581c0650d8d2ff293aea7b92"
+    },
+    {
+      "path": "docs/images/architecture.png",
+      "bytes": 237873,
+      "sha256": "bb27ac6b46a381b9d64e55b80361dfcb291f1a9cfbe5c2d1708c046736d73999"
+    },
+    {
+      "path": "docs/images/architecture.svg",
+      "bytes": 7260,
+      "sha256": "676aa06baf6ff51103aed88ee35fee914b9277f55e1cd5985a01bce4128d53fd"
+    },
+    {
+      "path": "docs/images/daily-history.png",
+      "bytes": 107366,
+      "sha256": "68384283cc6db6073f76ec48298d88260359da046999f13f877496b1ac185076"
+    },
+    {
+      "path": "docs/images/dashboard-desktop.png",
+      "bytes": 160897,
+      "sha256": "5421a979024eb9cbd0208a950e3a2de8af29fdffc560a18b06eca96610363e79"
+    },
+    {
+      "path": "docs/images/dashboard-mobile.png",
+      "bytes": 132767,
+      "sha256": "f818456972a98b4b92318e88b3d09efadeecb6c68373fd5ceef5e355037cb72d"
+    },
+    {
+      "path": "docs/images/screenshots.json",
+      "bytes": 1521,
+      "sha256": "3b84eda7730092a476c84fd04c6df7f966a702929c8704e0dd3e63fd6580e2d2"
+    },
+    {
+      "path": "docs/images/wiring-diagram.png",
+      "bytes": 356901,
+      "sha256": "f0e308f6ce343eaeb88bdf99ca043158b9e0ddf5e60bcfc2f1f959b1274fc565"
+    },
+    {
+      "path": "docs/images/wiring-diagram.svg",
+      "bytes": 12790,
+      "sha256": "7b39752308ad79f436406e9cefc99be53fffaf510aeaf646f1f1e6db0722c25b"
+    },
+    {
+      "path": "esphome/API_LOCAL.md",
+      "bytes": 18536,
+      "sha256": "bf9be3b256e95b1d5dcde80e0fdea7561f944d64525622a5a632cacd5d8405d0"
+    },
+    {
+      "path": "esphome/api/index.html",
+      "bytes": 16950,
+      "sha256": "6513136b87cff93040abf68c2c030efcd4bae8376b6dc49e75e702ffc17b42d2"
+    },
+    {
+      "path": "esphome/api/openapi.json",
+      "bytes": 81154,
+      "sha256": "8a0fffe6260fe5bcf77cd36f3a2fa68aac6dc860805295e4b09d01a9d50675f1"
+    },
+    {
+      "path": "esphome/api_assets.h",
+      "bytes": 79629,
+      "sha256": "b65b2ef4ec71e64c7751edc3279e905bde0660dc051f07df640c2a3fcc266012"
+    },
+    {
+      "path": "esphome/api_command.h",
+      "bytes": 1873,
+      "sha256": "43eda3e16cd08b62e169d0197883950a6f03ef4a6c06a356059963842ac44fb1"
+    },
+    {
+      "path": "esphome/api_requests.h",
+      "bytes": 12258,
+      "sha256": "9c77d42808a7aafbd3f713d49d1b2023e5d96dcda2d13588112c9f10f07ae5ed"
+    },
+    {
+      "path": "esphome/dashboard/dashboard.css",
+      "bytes": 31004,
+      "sha256": "a926c600c4b21c97255c513cb39a9b65aec1fbf4d3405279913eca1c879a06da"
+    },
+    {
+      "path": "esphome/dashboard/dashboard.js",
+      "bytes": 81058,
+      "sha256": "04bcb7c39e1c41f4c2e83b620f0891554fd6d15aa4743f2946bc2f1ea7e0861f"
+    },
+    {
+      "path": "esphome/dashboard/favicon.ico",
+      "bytes": 5019,
+      "sha256": "6ea21fbf3139661bb0fb7d2f451bf10ec265456a5842ab0cf4733e957fefd340"
+    },
+    {
+      "path": "esphome/dashboard/favicon.svg",
+      "bytes": 294,
+      "sha256": "40e20fd0d764fc1958f604ebf3cf855862631b6ae93c10c7478fc200b19e995d"
+    },
+    {
+      "path": "esphome/dashboard/favicon_asset.h",
+      "bytes": 31670,
+      "sha256": "5c76e4f6fbc321bd1c6d00124addd649d285fa2f520474b1dc89f6fc47ace973"
+    },
+    {
+      "path": "esphome/dashboard/preview.html",
+      "bytes": 10877,
+      "sha256": "b249c0fc23ced5fc23f179d89a376e34f223050c59a68a9bf61014992ca52306"
+    },
+    {
+      "path": "esphome/dashboard/pwa.css",
+      "bytes": 3938,
+      "sha256": "bd0a5efbd7bd7c44688e529c6e633bb430e6a20344ab412ce476f38b818ed70b"
+    },
+    {
+      "path": "esphome/dashboard/pwa.js",
+      "bytes": 9882,
+      "sha256": "03c69a95e1de8428f4b46ff5ce7136003433cfbcde4dcc110f56120ff7664544"
+    },
+    {
+      "path": "esphome/dashboard/pwa/app.html",
+      "bytes": 903,
+      "sha256": "7f9c0c6c6cb073cfbb43b2b44997b5d35bd89d8835d87717e3646283a5918689"
+    },
+    {
+      "path": "esphome/dashboard/pwa/icons/apple-touch-icon.png",
+      "bytes": 3068,
+      "sha256": "8409b815bf86f25938cf53ecb66a4d99d4ee3b1ef4000bf6abe58937c4f247aa"
+    },
+    {
+      "path": "esphome/dashboard/pwa/icons/icon-192.png",
+      "bytes": 3252,
+      "sha256": "93337f5bb90d4b164c0b0c77651c5c3390218214418458e055874339542112b0"
+    },
+    {
+      "path": "esphome/dashboard/pwa/icons/icon-512.png",
+      "bytes": 6427,
+      "sha256": "5b23d5041ed6d42007ac8629f08298a0453ebba30c4a4bfb26086650806bebe6"
+    },
+    {
+      "path": "esphome/dashboard/pwa/icons/maskable-512.png",
+      "bytes": 4621,
+      "sha256": "7773cb53aae9db81ab416a56f3ee5a0ed683351d6d373112614242250eb6b825"
+    },
+    {
+      "path": "esphome/dashboard/pwa/manifest.webmanifest",
+      "bytes": 591,
+      "sha256": "0769c6f060f9b4b749d1e6da8420a4892d0f74b759851c5326d004386dbcc097"
+    },
+    {
+      "path": "esphome/dashboard/pwa/sw.js",
+      "bytes": 4975,
+      "sha256": "04b342e7ebc4e3c9ff8d4a27a027ea3d47277ab84e6727f8a7597580f2c3a21f"
+    },
+    {
+      "path": "esphome/dashboard/pwa_assets.h",
+      "bytes": 128979,
+      "sha256": "10da0e28bff0f362f1fd39733c1da7413107967f85aad60deb71d9c7e2dcea85"
+    },
+    {
+      "path": "esphome/dashboard_backend.h",
+      "bytes": 45612,
+      "sha256": "c9f4b0f236762c442a1b0cafa4ce0317c5b91adc1ab2281415a65e6682c61bed"
+    },
+    {
+      "path": "esphome/dashboard_history_json.h",
+      "bytes": 3971,
+      "sha256": "8d9a39f510cb3f99d7e98edde9dcf2190eef1ba8241ae725f444da26591a9e4f"
+    },
+    {
+      "path": "esphome/heater_control.h",
+      "bytes": 13038,
+      "sha256": "17a0b2881ee790a665de5863b5f3b3b0a0c94c51571b8c1ab7b7318163e68b34"
+    },
+    {
+      "path": "esphome/heater_diagnostics.h",
+      "bytes": 5273,
+      "sha256": "b9e7c84906421e34447a0d4fa78324d42e0286d647b0ca2f22191d1648ded3e6"
+    },
+    {
+      "path": "esphome/heater_health.h",
+      "bytes": 9942,
+      "sha256": "2dd253890890d114616a3dcd4c2d29579f706047235a20bf68ae725b87c26324"
+    },
+    {
+      "path": "esphome/heater_history.h",
+      "bytes": 10525,
+      "sha256": "17a1cdfe6c149f4b579ecc56a21655accd7400b3d16a2c8038ab6210bf1904c3"
+    },
+    {
+      "path": "esphome/heater_periods.h",
+      "bytes": 15810,
+      "sha256": "aaa957fe9b450a9eacc48eb8903c83c5f72efbfee3db187e22549ad686416eaa"
+    },
+    {
+      "path": "esphome/heater_runtime.h",
+      "bytes": 880,
+      "sha256": "11d01ea0531baeb3d9ae9de1a3bbeb0e151bdd78a2457b5a9323ddc22ee038d0"
+    },
+    {
+      "path": "esphome/heater_sessions.h",
+      "bytes": 8404,
+      "sha256": "c0147c6b6e16acb6235a6ba034ecb3db7afe0e9fc29364ac783b93e1b446d479"
+    },
+    {
+      "path": "esphome/heater_stats.h",
+      "bytes": 22782,
+      "sha256": "7f36efe8a8c3a4f0aab0851df54dbe607861168ad69bac36d543ef6822c8dcad"
+    },
+    {
+      "path": "esphome/heater_storage.h",
+      "bytes": 18071,
+      "sha256": "5cd51316f22071fb76e43a2d213298676546ba2ee085d2ea3407e4e1cdaaecbd"
+    },
+    {
+      "path": "esphome/line_diagnostics.h",
+      "bytes": 7580,
+      "sha256": "a3ab2ccebfe9fb9c0ec3fcbd73dc9d92c29e57f616a066c5f81fc5e048034e6a"
+    },
+    {
+      "path": "esphome/packages/active_reads.yaml",
+      "bytes": 3191,
+      "sha256": "0bd8cb53b853202abd48b5be8f227499503f00416fac2790d724a0e9ec714b86"
+    },
+    {
+      "path": "esphome/packages/diagnostics.yaml",
+      "bytes": 2714,
+      "sha256": "53a055ec9ed076b3a47b057149bba24dabffa2adc1cf657906a06f761493ef46"
+    },
+    {
+      "path": "esphome/packages/line_diagnostics.yaml",
+      "bytes": 3095,
+      "sha256": "2fe42410f4276770e2e002bbcfc2dae675af5274588dc1adecc75b50d8f56309"
+    },
+    {
+      "path": "esphome/packages/passive_rx.yaml",
+      "bytes": 1775,
+      "sha256": "b45e6b181269afb5e00cd82ec23f10427e65e01f10a0e480e6a3aacfba7ac5da"
+    },
+    {
+      "path": "esphome/packages/read_telemetry.yaml",
+      "bytes": 6924,
+      "sha256": "7fefe7c8154621397d1553d5216a9d3e592cce095f60c9a28f44775b1658f3da"
+    },
+    {
+      "path": "esphome/packages/smart_dashboard.yaml",
+      "bytes": 8245,
+      "sha256": "7f1106822c24192e729fd2d9a23fc2059de60eed4453c0e8b1537622207fd4da"
+    },
+    {
+      "path": "esphome/packages/temperature_control.yaml",
+      "bytes": 3081,
+      "sha256": "6b9ff5ae9d0d8cb0b2d649e23e8d21a3cc919a651c72aead8d394a9026b0cfa2"
+    },
+    {
+      "path": "esphome/read_query_test.h",
+      "bytes": 20096,
+      "sha256": "5a8f320073d2d8a8f66790db676273f0720151b5c0b5699e57c966d9a573c415"
+    },
+    {
+      "path": "esphome/rinnai-install.example.yaml",
+      "bytes": 270,
+      "sha256": "cd19de18b58e9d9fe7cae4ea531e1ede2cdf0eefe13a90bb69b9053316bd9c62"
+    },
+    {
+      "path": "esphome/rinnai-query-test-wroom32.yaml",
+      "bytes": 418,
+      "sha256": "3fac419daf8f4ae9443ddf3cac15e840b90cd457328ce805759d34dc2564a38d"
+    },
+    {
+      "path": "esphome/rinnai-smart-wroom32.yaml",
+      "bytes": 1601,
+      "sha256": "bb0eec8197a3f0e66144795517d17157f77e1266ba17d3f0d02314dd0a3d9032"
+    },
+    {
+      "path": "esphome/rinnai-sniffer-wroom32.yaml",
+      "bytes": 1618,
+      "sha256": "ee21ac4d809b2e6368da8e4302b0882491148a7fe4f084dfb564b210f7476246"
+    },
+    {
+      "path": "esphome/rinnai-telemetry-wroom32.yaml",
+      "bytes": 505,
+      "sha256": "bd82f3db6701be72b81d9554f9ecd728d5be268a843bb30a77b08788c6e12f2a"
+    },
+    {
+      "path": "esphome/rinnai_telemetry.h",
+      "bytes": 9631,
+      "sha256": "6a10365850810040f83b0f3509531a28a8206ee79e6b7d7e4524d7d9d7d392f7"
+    },
+    {
+      "path": "esphome/rx_controls.h",
+      "bytes": 2661,
+      "sha256": "bf5d01f8eb71cad3416960feeccd7e8c3efec7bf737580e61ef0f7951e0fbd63"
+    },
+    {
+      "path": "esphome/rx_selftest.h",
+      "bytes": 5680,
+      "sha256": "4c815890e30eb1fb3b65017b71e25339c43d4b96c277965637f9a6c15b592768"
+    },
+    {
+      "path": "esphome/secrets.example.yaml",
+      "bytes": 557,
+      "sha256": "244febaca1a7af40f5fca32d21a4bf45883dd0d17b340a5b5e133b0ea5f7b8a8"
+    },
+    {
+      "path": "home_assistant/README.md",
+      "bytes": 11915,
+      "sha256": "86d74ad2391442da5b6c3068dea5a7491b9f49231091d1645499293911faf0bb"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/__init__.py",
+      "bytes": 4143,
+      "sha256": "20cde1cf211cac2ff78ebdc37feac17f91ac1f93d88d61e23e3d946ca8aef93a"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/calendar.py",
+      "bytes": 2706,
+      "sha256": "4c9b27a0bd14b617b575861c3493d0b98c8bb0759e99b53b9f56901d545b3e56"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/client.py",
+      "bytes": 1896,
+      "sha256": "5b0dd5ef4f529cc3c794d9b8e703a42a9978b6cf8976cba543fd4c0baef13121"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/config_flow.py",
+      "bytes": 3192,
+      "sha256": "e0c6bbaa44c9888e17d3c7f42c5c105ff96bd6d8d4a2e5c09fd880cf92a3c27d"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/const.py",
+      "bytes": 304,
+      "sha256": "310b2685370b0d4f693eb6e478fcd0c386f862f3343ccdedffbb52b12d6778b9"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/coordinator.py",
+      "bytes": 2751,
+      "sha256": "648fc1e4d708e35967ff3b46a396c6146b63326053a7770ebce86f7d43ceaa21"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/entity.py",
+      "bytes": 769,
+      "sha256": "73c9f0830a2e365354569367f6540020d660182a7a3cc31e3fc82c62cdccf005"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/ledger.py",
+      "bytes": 26009,
+      "sha256": "787ca954e614b0bf9394a11ee0f01f96f7f6f4e161365da3bd28c3134803e854"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/manifest.json",
+      "bytes": 265,
+      "sha256": "ba0efc713bd8db094b66e53d27fe057b0d052e2daa5043b45c242c3820e66625"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/sensor.py",
+      "bytes": 4677,
+      "sha256": "d99f426b413b7bc7baaac2d3241a79cb164ea2f75a2de8e30e7c6443de42cb51"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/services.yaml",
+      "bytes": 1017,
+      "sha256": "e6fcf228ef5ee2e3350c995fb99fb5fa5161562fe56027172eecb44f944b2ace"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/storage.py",
+      "bytes": 3082,
+      "sha256": "4cd807756c8398ff0c77a5d03f91e02abceed958f75ec297402c7f1ab49db297"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/strings.json",
+      "bytes": 1073,
+      "sha256": "bc2dde16a6421f1ebb9b07c7d3480fcee058e9dc2f4c478b695502c2dc182518"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/translations/en.json",
+      "bytes": 1073,
+      "sha256": "bc2dde16a6421f1ebb9b07c7d3480fcee058e9dc2f4c478b695502c2dc182518"
+    },
+    {
+      "path": "home_assistant/custom_components/rinnai_local/translations/pt-BR.json",
+      "bytes": 1156,
+      "sha256": "142dbb2fde7e5460bd4c31758939b504cebde68cfcb1e64f5fd03e716e33234c"
+    },
+    {
+      "path": "home_assistant/dashboard.example.yaml",
+      "bytes": 1536,
+      "sha256": "b49c27e1cb93388e1e7c4c5a93a998d7f4d826157453b8cd661526e070e9fa20"
+    },
+    {
+      "path": "home_assistant/tests/test_ha_adapters.py",
+      "bytes": 9070,
+      "sha256": "479f61bce487f6bb7f45bd13022ff630f1e81e70f21e86a1b4bf4b7a2026675b"
+    },
+    {
+      "path": "home_assistant/tests/test_ledger.py",
+      "bytes": 18538,
+      "sha256": "9c86a77512bd4940be1bbb22eb330a6e78d907dd48a722a3dd254becdfee0439"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 200,
+      "sha256": "7689eda3f953f6412a82a6a3227e2ece7af98f254da68a8e4b28a8dadfb1a52f"
+    }
+  ],
+  "findings": [],
+  "audit": {
+    "allowlist_only": true,
+    "local_secrets_read": false,
+    "embedded_gzip_inspected": true,
+    "gitignore_paths_checked": true,
+    "literal_wifi_and_credentials_checked": true,
+    "device_access": false,
+    "git_commands_run": false
+  }
+}

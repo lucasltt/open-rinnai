@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1500" viewBox="0 0 1800 1500" role="img" aria-labelledby="title desc"><title id="title">Ligação do adaptador local Rinnai com ESP32</title><desc id="desc">Diagrama funcional validado no protótipo REU-E211: GPIO25 TX por resistor de 1k e conversor LV1/HV1 para P1 RX; P2 TX por HV2/LV2 e resistor de 1k para GPIO26 RX. Buck12V para5V, conversorHV5V, LV3.3V e terra comum. Posições P1 a P4 são rótulos provisórios, não pinagem oficial.</desc><defs><marker id="tx" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#1b837b"/></marker><marker id="rx" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d07435"/></marker><marker id="power" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#b64e50"/></marker><marker id="blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#517fa6"/></marker><marker id="gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#627485"/></marker></defs><g font-family="Segoe UI, Arial, sans-serif">
+<rect width="1800" height="1500" fill="#f6f8f8"/>
+<text x="70" y="75" font-size="42" fill="#233747" font-weight="700" text-anchor="start">Ligação do adaptador local</text>
+<text x="70" y="117" font-size="23" fill="#667985" font-weight="400" text-anchor="start">Rinnai REU-E211 · placa reportada RUS-11E32FR · ESP32-WROOM-32 DevKit</text>
+<text x="70" y="179" font-size="21" fill="#758693" font-weight="700" text-anchor="start">A  SINAIS UART</text>
+<text x="1730" y="179" font-size="21" fill="#758693" font-weight="400" text-anchor="end">9600 baud · 8N1</text>
+<rect x="70" y="220" width="350" height="330" rx="20" fill="#ffffff" stroke="#dce3e6" stroke-width="2"/>
+<rect x="690" y="220" width="230" height="330" rx="20" fill="#ffffff" stroke="#dce3e6" stroke-width="2"/>
+<rect x="1230" y="220" width="500" height="330" rx="20" fill="#ffffff" stroke="#dce3e6" stroke-width="2"/>
+<text x="95" y="260" font-size="24" fill="#233747" font-weight="700" text-anchor="start">AQUECEDOR</text>
+<text x="95" y="290" font-size="19" fill="#667985" font-weight="400" text-anchor="start">Conector de acessórios</text>
+<text x="95" y="340" font-size="25" fill="#233747" font-weight="650" text-anchor="start">P1  RX</text>
+<text x="95" y="366" font-size="18" fill="#667985" font-weight="400" text-anchor="start">Recebe comandos e consultas</text>
+<text x="95" y="455" font-size="25" fill="#233747" font-weight="650" text-anchor="start">P2  TX</text>
+<text x="95" y="481" font-size="18" fill="#667985" font-weight="400" text-anchor="start">Envia respostas</text>
+<text x="805" y="260" font-size="21" fill="#233747" font-weight="700" text-anchor="middle">CONVERSOR</text>
+<text x="805" y="288" font-size="17" fill="#667985" font-weight="400" text-anchor="middle">HV / LV · MOSFET</text>
+<text x="705" y="340" font-size="19" fill="#233747" font-weight="650" text-anchor="start">HV1</text>
+<text x="905" y="340" font-size="19" fill="#233747" font-weight="650" text-anchor="end">LV1</text>
+<text x="705" y="455" font-size="19" fill="#233747" font-weight="650" text-anchor="start">HV2</text>
+<text x="905" y="455" font-size="19" fill="#233747" font-weight="650" text-anchor="end">LV2</text>
+<text x="805" y="514" font-size="21" fill="#667985" font-weight="400" text-anchor="middle">5 V ↔ 3,3 V</text>
+<text x="1260" y="260" font-size="25" fill="#233747" font-weight="700" text-anchor="start">ESP32-WROOM-32</text>
+<text x="1260" y="289" font-size="19" fill="#667985" font-weight="400" text-anchor="start">DevKit · lógica de 3,3 V</text>
+<text x="1260" y="340" font-size="25" fill="#233747" font-weight="650" text-anchor="start">GPIO25  TX</text>
+<text x="1260" y="366" font-size="18" fill="#667985" font-weight="400" text-anchor="start">Saída de consulta / ajuste</text>
+<text x="1260" y="455" font-size="25" fill="#233747" font-weight="650" text-anchor="start">GPIO26  RX</text>
+<text x="1260" y="481" font-size="18" fill="#667985" font-weight="400" text-anchor="start">Entrada de resposta</text>
+<polyline points="1230,330 1145,330" fill="none" stroke="#1b837b" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1035" y="311" width="110" height="38" rx="5" fill="#e5f4ef" stroke="#1b837b" stroke-width="2"/>
+<text x="1090" y="337" font-size="20" fill="#1b837b" font-weight="650" text-anchor="middle">1 kΩ</text>
+<polyline points="1035,330 920,330" fill="none" stroke="#1b837b" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#tx)"/>
+<polyline points="690,330 420,330" fill="none" stroke="#1b837b" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#tx)"/>
+<polyline points="810,330 775,330" fill="none" stroke="#1b837b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#tx)"/>
+<text x="555" y="313" font-size="17" fill="#1b837b" font-weight="650" text-anchor="middle">CONSULTA / AJUSTE</text>
+<text x="1090" y="301" font-size="16" fill="#667985" font-weight="400" text-anchor="middle">R1</text>
+<polyline points="420,445 690,445" fill="none" stroke="#d07435" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rx)"/>
+<polyline points="775,445 810,445" fill="none" stroke="#d07435" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rx)"/>
+<polyline points="920,445 1035,445" fill="none" stroke="#d07435" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="1035" y="426" width="110" height="38" rx="5" fill="#fff0e4" stroke="#d07435" stroke-width="2"/>
+<text x="1090" y="452" font-size="20" fill="#b65a25" font-weight="650" text-anchor="middle">1 kΩ</text>
+<polyline points="1145,445 1230,445" fill="none" stroke="#d07435" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rx)"/>
+<text x="555" y="427" font-size="17" fill="#c46a2e" font-weight="650" text-anchor="middle">RESPOSTA</text>
+<text x="1090" y="415" font-size="16" fill="#667985" font-weight="400" text-anchor="middle">R2</text>
+<circle cx="420" cy="330" r="5" fill="#1b837b"/>
+<circle cx="690" cy="330" r="5" fill="#1b837b"/>
+<circle cx="920" cy="330" r="5" fill="#1b837b"/>
+<circle cx="1230" cy="330" r="5" fill="#1b837b"/>
+<circle cx="420" cy="445" r="5" fill="#d07435"/>
+<circle cx="690" cy="445" r="5" fill="#d07435"/>
+<circle cx="920" cy="445" r="5" fill="#d07435"/>
+<circle cx="1230" cy="445" r="5" fill="#d07435"/>
+<text x="70" y="594" font-size="21" fill="#667985" font-weight="400" text-anchor="start">Os resistores ficam entre os GPIOs e os canais LV; as setas indicam o fluxo de dados.</text>
+<text x="70" y="655" font-size="21" fill="#758693" font-weight="700" text-anchor="start">B  ALIMENTAÇÃO E REFERÊNCIA</text>
+<rect x="70" y="705" width="350" height="255" rx="20" fill="#ffffff" stroke="#dce3e6" stroke-width="2"/>
+<rect x="580" y="705" width="280" height="255" rx="20" fill="#ffffff" stroke="#dce3e6" stroke-width="2"/>
+<rect x="1040" y="705" width="320" height="255" rx="20" fill="#ffffff" stroke="#dce3e6" stroke-width="2"/>
+<rect x="1470" y="705" width="260" height="255" rx="20" fill="#ffffff" stroke="#dce3e6" stroke-width="2"/>
+<text x="95" y="746" font-size="23" fill="#233747" font-weight="700" text-anchor="start">AQUECEDOR</text>
+<text x="95" y="804" font-size="25" fill="#233747" font-weight="650" text-anchor="start">P3  +12 V</text>
+<text x="95" y="894" font-size="25" fill="#233747" font-weight="650" text-anchor="start">P4  GND</text>
+<text x="720" y="747" font-size="23" fill="#233747" font-weight="700" text-anchor="middle">STEP-DOWN</text>
+<text x="720" y="780" font-size="20" fill="#667985" font-weight="400" text-anchor="middle">Entrada: 12 V</text>
+<text x="720" y="821" font-size="22" fill="#233747" font-weight="650" text-anchor="middle">Saída ajustada: 5 V</text>
+<text x="720" y="895" font-size="20" fill="#667985" font-weight="400" text-anchor="middle">IN− / OUT− → GND</text>
+<text x="1065" y="747" font-size="23" fill="#233747" font-weight="700" text-anchor="start">ESP32 DEVKIT</text>
+<text x="1065" y="804" font-size="24" fill="#233747" font-weight="650" text-anchor="start">5V / VIN*</text>
+<text x="1065" y="867" font-size="24" fill="#233747" font-weight="650" text-anchor="start">3V3</text>
+<text x="1065" y="923" font-size="24" fill="#233747" font-weight="650" text-anchor="start">GND</text>
+<text x="1490" y="747" font-size="22" fill="#233747" font-weight="700" text-anchor="start">CONVERSOR</text>
+<text x="1490" y="804" font-size="22" fill="#233747" font-weight="650" text-anchor="start">HV  ← 5 V</text>
+<text x="1490" y="867" font-size="22" fill="#233747" font-weight="650" text-anchor="start">LV  ← 3,3 V</text>
+<text x="1490" y="923" font-size="22" fill="#233747" font-weight="650" text-anchor="start">GND</text>
+<polyline points="420,795 580,795" fill="none" stroke="#b64e50" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#power)"/>
+<text x="500" y="777" font-size="18" fill="#b64e50" font-weight="650" text-anchor="middle">12 V</text>
+<polyline points="860,795 1040,795" fill="none" stroke="#b64e50" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#power)"/>
+<text x="940" y="777" font-size="18" fill="#b64e50" font-weight="650" text-anchor="middle">5 V</text>
+<polyline points="965,795 965,680 1415,680 1415,795 1470,795" fill="none" stroke="#b64e50" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#power)"/>
+<circle cx="965" cy="795" r="5" fill="#b64e50"/>
+<text x="1190" y="672" font-size="18" fill="#b64e50" font-weight="400" text-anchor="middle">mesmos 5 V regulados</text>
+<polyline points="1360,858 1470,858" fill="none" stroke="#517fa6" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#blue)"/>
+<text x="1415" y="845" font-size="17" fill="#517fa6" font-weight="650" text-anchor="middle">3,3 V</text>
+<polyline points="420,885 465,885 465,1030 1600,1030" fill="none" stroke="#627485" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="720,960 720,1030" fill="none" stroke="#627485" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1200,960 1200,1030" fill="none" stroke="#627485" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="1600,960 1600,1030" fill="none" stroke="#627485" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="465" cy="1030" r="5" fill="#627485"/>
+<circle cx="720" cy="1030" r="5" fill="#627485"/>
+<circle cx="1200" cy="1030" r="5" fill="#627485"/>
+<circle cx="1600" cy="1030" r="5" fill="#627485"/>
+<text x="1040" y="1063" font-size="21" fill="#627485" font-weight="650" text-anchor="middle">GND COMUM  ·  aquecedor + buck + ESP32 + conversor</text>
+<text x="70" y="1116" font-size="20" fill="#667985" font-weight="400" text-anchor="start">* Use o pino de entrada 5 V correto da sua DevKit. Não aplique 12 V no ESP32 nem no conversor lógico.</text>
+<rect x="70" y="1165" width="1660" height="257" rx="20" fill="#eef2f4" stroke="#dce3e6" stroke-width="2"/>
+<text x="98" y="1206" font-size="22" fill="#233747" font-weight="700" text-anchor="start">ANTES DE REPLICAR A MONTAGEM</text>
+<text x="98" y="1245" font-size="21" fill="#536b7b" font-weight="400" text-anchor="start">P1–P4 são rótulos provisórios na ordem de cima para baixo relatada no protótipo; não são numeração oficial.</text>
+<text x="98" y="1284" font-size="21" fill="#536b7b" font-weight="400" text-anchor="start">Confirme orientação, GND e tensões no seu aparelho. O conector e seu passo ainda não foram identificados.</text>
+<text x="98" y="1323" font-size="21" fill="#536b7b" font-weight="400" text-anchor="start">P1/P2 medidos em ~5 V em repouso são sinais: não use esses pinos para alimentar HV. HV vem do buck.</text>
+<text x="98" y="1362" font-size="21" fill="#536b7b" font-weight="400" text-anchor="start">O módulo HV/LV por MOSFET adapta o nível lógico; não fornece isolação galvânica da rede elétrica.</text>
+<text x="98" y="1401" font-size="21" fill="#536b7b" font-weight="400" text-anchor="start">Capacidade da saída de 12 V e isolação da placa não foram caracterizadas. Diagrama funcional, sem escala física.</text>
+</g></svg>

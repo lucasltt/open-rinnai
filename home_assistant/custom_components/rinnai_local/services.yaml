@@ -1,0 +1,40 @@
+get_history:
+  name: Consultar usos arquivados
+  description: Retorna registros persistidos em páginas, inclusive usos sem horário. Funciona com o ESP offline.
+  fields:
+    entry_id:
+      name: ID da integração
+      description: Opcional quando existe somente um arquivo Rinnai Local.
+      selector:
+        text:
+    offset:
+      name: Primeiro registro
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 50000
+          mode: box
+    limit:
+      name: Quantidade por página
+      default: 100
+      selector:
+        number:
+          min: 1
+          max: 500
+          mode: box
+    start:
+      name: Início do período
+      description: ISO com fuso horário, por exemplo 2026-11-01T00:00:00-03:00.
+      selector:
+        text:
+    end:
+      name: Fim do período
+      description: ISO com fuso horário; limite exclusivo.
+      selector:
+        text:
+    include_undated:
+      name: Incluir usos sem horário
+      default: true
+      selector:
+        boolean:

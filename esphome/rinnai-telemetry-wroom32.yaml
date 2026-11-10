@@ -1,0 +1,14 @@
+# Validated direction: GPIO25 -> heater P1 RX; GPIO26 <- heater P2 TX.
+# Keep the HV/LV converter and both installed 1k series resistors.
+# Read-only protocol: no setpoint, toggle, or ignition control is included.
+packages:
+  receiver: !include rinnai-sniffer-wroom32.yaml
+  heater_telemetry: !include packages/read_telemetry.yaml
+
+esphome:
+  comment: Leitura local de temperaturas e diagnosticos Rinnai REU-E211.
+  project:
+    version: 0.5.0
+  includes:
+    - read_query_test.h
+    - rinnai_telemetry.h

@@ -1,0 +1,30 @@
+{
+  "title": "Rinnai Local",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Completed hot-water uses",
+        "description": "Imports durable use records from the ESP32. Requires firmware 1.2.0 or later.",
+        "data": {"base_url": "ESP32 base URL", "max_records": "Archive record limit"}
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to the ESP32.",
+      "invalid_device": "Invalid address or durable history API. Check firmware 1.2.0 and device storage."
+    },
+    "abort": {"already_configured": "This device's archive is already configured."}
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "History archive options",
+        "description": "A full archive stops importing and reports an error; older records are never discarded silently.",
+        "data": {"base_url": "ESP32 base URL", "max_records": "Archive record limit"}
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to the ESP32.",
+      "invalid_device": "Invalid address or a different device answered."
+    }
+  }
+}

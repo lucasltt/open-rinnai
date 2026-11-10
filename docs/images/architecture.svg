@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1030" viewBox="0 0 1600 1030" role="img" aria-labelledby="title desc"><title id="title">Arquitetura do adaptador local Rinnai</title><desc id="desc">Aquecedor conectado por UART a um ESP32. O ESP32 fornece painel HTTP e APIJSON naLAN para celular e visor, além de API ESPHome criptografada para futura integração HomeAssistant. SNTP sincroniza o relógio quando disponível.</desc><defs><marker id="tx" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#1b837b"/></marker><marker id="rx" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#d07435"/></marker><marker id="power" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#b64e50"/></marker><marker id="blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#517fa6"/></marker><marker id="gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#627485"/></marker></defs><g font-family="Segoe UI, Arial, sans-serif">
+<rect width="1600" height="1030" fill="#f6f8f8"/>
+<text x="70" y="75" font-size="42" fill="#233747" font-weight="700" text-anchor="start">Arquitetura do projeto</text>
+<text x="70" y="116" font-size="23" fill="#667985" font-weight="400" text-anchor="start">Controle e leituras na rede local; sem depender do aplicativo ou da nuvem do fabricante.</text>
+<rect x="65" y="390" width="325" height="225" rx="20" fill="#ffffff" stroke="#dce3e6" stroke-width="2"/>
+<text x="227" y="442" font-size="27" fill="#233747" font-weight="700" text-anchor="middle">AQUECEDOR</text>
+<text x="227" y="480" font-size="23" fill="#233747" font-weight="400" text-anchor="middle">Rinnai REU-E211</text>
+<text x="227" y="524" font-size="19" fill="#667985" font-weight="400" text-anchor="middle">Sensores e controle original</text>
+<text x="227" y="556" font-size="19" fill="#667985" font-weight="400" text-anchor="middle">Proteções da própria placa</text>
+<rect x="595" y="330" width="345" height="345" rx="20" fill="#192c3a" stroke="#192c3a" stroke-width="2"/>
+<text x="767" y="382" font-size="34" fill="#ffffff" font-weight="700" text-anchor="middle">ESP32</text>
+<text x="767" y="419" font-size="21" fill="#dde8ed" font-weight="400" text-anchor="middle">Firmware ESPHome + C++</text>
+<text x="767" y="467" font-size="21" fill="#dde8ed" font-weight="400" text-anchor="middle">Consulta e valida quadros</text>
+<text x="767" y="506" font-size="21" fill="#dde8ed" font-weight="400" text-anchor="middle">Confirma cada ajuste</text>
+<text x="767" y="545" font-size="21" fill="#dde8ed" font-weight="400" text-anchor="middle">Calcula usos e estimativas</text>
+<text x="767" y="584" font-size="21" fill="#dde8ed" font-weight="400" text-anchor="middle">Histórico e configurações</text>
+<text x="767" y="635" font-size="21" fill="#ffb486" font-weight="650" text-anchor="middle">Wi-Fi local</text>
+<polyline points="595,475 390,475" fill="none" stroke="#1b837b" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#tx)"/>
+<polyline points="390,535 595,535" fill="none" stroke="#d07435" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rx)"/>
+<text x="492" y="432" font-size="21" fill="#233747" font-weight="700" text-anchor="middle">UART</text>
+<text x="492" y="459" font-size="18" fill="#667985" font-weight="400" text-anchor="middle">9600 · 8N1</text>
+<text x="492" y="577" font-size="17" fill="#667985" font-weight="400" text-anchor="middle">HV/LV + 2 × 1 kΩ</text>
+<rect x="1190" y="190" width="335" height="170" rx="20" fill="#ffffff" stroke="#dce3e6" stroke-width="2"/>
+<text x="1357.5" y="232" font-size="22" fill="#233747" font-weight="700" text-anchor="middle">CELULAR / NAVEGADOR</text>
+<text x="1357.5" y="272" font-size="19" fill="#667985" font-weight="400" text-anchor="middle">Dashboard e app de tela inicial</text>
+<text x="1357.5" y="312" font-size="19" fill="#1b837b" font-weight="650" text-anchor="middle">HTTP :80 · /app</text>
+<rect x="1190" y="445" width="335" height="170" rx="20" fill="#ffffff" stroke="#dce3e6" stroke-width="2"/>
+<text x="1357.5" y="487" font-size="22" fill="#233747" font-weight="700" text-anchor="middle">HOME ASSISTANT</text>
+<text x="1357.5" y="527" font-size="19" fill="#667985" font-weight="400" text-anchor="middle">Integração futura preparada</text>
+<text x="1357.5" y="567" font-size="19" fill="#517fa6" font-weight="650" text-anchor="middle">API ESPHome :6053 · cifrada</text>
+<rect x="1190" y="700" width="335" height="170" rx="20" fill="#ffffff" stroke="#dce3e6" stroke-width="2"/>
+<text x="1357.5" y="742" font-size="22" fill="#233747" font-weight="700" text-anchor="middle">VISOR OU SCRIPT</text>
+<text x="1357.5" y="782" font-size="19" fill="#667985" font-weight="400" text-anchor="middle">Cliente independente na LAN</text>
+<text x="1357.5" y="822" font-size="19" fill="#d07435" font-weight="650" text-anchor="middle">HTTP JSON · /api/v1</text>
+<polyline points="940,410 1060,410 1060,275 1190,275" fill="none" stroke="#1b837b" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#tx)"/>
+<polyline points="940,505 1190,505" fill="none" stroke="#517fa6" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#blue)"/>
+<polyline points="940,595 1060,595 1060,785 1190,785" fill="none" stroke="#d07435" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#rx)"/>
+<text x="1068" y="468" font-size="17" fill="#758693" font-weight="700" text-anchor="middle">REDE LOCAL</text>
+<rect x="595" y="170" width="345" height="105" rx="20" fill="#eef2f4" stroke="#dce3e6" stroke-width="2"/>
+<text x="767" y="210" font-size="22" fill="#233747" font-weight="700" text-anchor="middle">RELÓGIO SNTP</text>
+<text x="767" y="245" font-size="18" fill="#667985" font-weight="400" text-anchor="middle">Sincronização quando disponível</text>
+<polyline points="767,275 767,330" fill="none" stroke="#627485" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#gray)" stroke-dasharray="7 7"/>
+<rect x="65" y="745" width="875" height="125" rx="20" fill="#eef2f4" stroke="#dce3e6" stroke-width="2"/>
+<text x="92" y="786" font-size="22" fill="#233747" font-weight="700" text-anchor="start">ALIMENTAÇÃO</text>
+<text x="92" y="824" font-size="22" fill="#536b7b" font-weight="400" text-anchor="start">Acessório 12 V → step-down 5 V → DevKit + conversor</text>
+<text x="70" y="935" font-size="21" fill="#667985" font-weight="400" text-anchor="start">HTTP local sem login no firmware atual. OTA nativa mantém senha; API ESPHome usa chave própria.</text>
+<text x="70" y="974" font-size="20" fill="#667985" font-weight="400" text-anchor="start">Em HTTP no IP local, a experiência de tela inicial do iPhone depende da conexão com a rede; não há cache offline ativo.</text>
+</g></svg>

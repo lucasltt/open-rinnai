@@ -1,0 +1,8 @@
+# Ambiente de compilação utilizado no firmware 1.1.0.
+esphome==2026.6.5
+protobuf>=6,<8
+Pillow==12.2.0
+
+# Verificação opcional da API HTTP e do contrato OpenAPI.
+requests>=2.32,<3
+jsonschema>=4,<5

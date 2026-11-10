@@ -1,0 +1,30 @@
+{
+  "title": "Rinnai Local",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Histórico de usos de água quente",
+        "description": "Importa registros persistidos pelo ESP32. Requer firmware 1.2.0 ou posterior.",
+        "data": {"base_url": "URL base do ESP32", "max_records": "Limite de registros no arquivo"}
+      }
+    },
+    "error": {
+      "cannot_connect": "Não foi possível conectar ao ESP32.",
+      "invalid_device": "Endereço ou API de histórico inválido. Confira firmware 1.2.0 e armazenamento do ESP."
+    },
+    "abort": {"already_configured": "O histórico deste dispositivo já está configurado."}
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opções do histórico",
+        "description": "Ao atingir o limite, a importação para e sinaliza erro. Registros antigos não são apagados silenciosamente.",
+        "data": {"base_url": "URL base do ESP32", "max_records": "Limite de registros no arquivo"}
+      }
+    },
+    "error": {
+      "cannot_connect": "Não foi possível conectar ao ESP32.",
+      "invalid_device": "Endereço inválido ou respondeu outro dispositivo."
+    }
+  }
+}

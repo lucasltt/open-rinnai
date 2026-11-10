@@ -1,0 +1,114 @@
+# Health and raw-capture diagnostics only; these are not heater measurements.
+esphome:
+  on_boot:
+    - priority: -100
+      then:
+        - text_sensor.template.publish:
+            id: rinnai_p1_last_block
+            state: Sem bytes recebidos
+        - text_sensor.template.publish:
+            id: rinnai_p2_last_block
+            state: Sem bytes recebidos
+
+debug:
+  update_interval: 10s
+
+sensor:
+  - platform: uptime
+    name: Tempo desde boot
+    id: rinnai_uptime
+    update_interval: 10s
+
+  - platform: wifi_signal
+    name: Sinal Wi-Fi da rede
+    id: rinnai_wifi_signal
+    update_interval: 10s
+
+  - platform: debug
+    free:
+      name: RAM livre
+      id: rinnai_heap_free
+    min_free:
+      name: Menor RAM livre desde boot
+    block:
+      name: Maior bloco livre de RAM
+    loop_time:
+      name: Maior tempo do loop
+
+  - platform: template
+    name: P1 bytes desde boot
+    id: rinnai_p1_bytes
+    entity_category: diagnostic
+    icon: mdi:counter
+    unit_of_measurement: B
+    accuracy_decimals: 0
+    state_class: total_increasing
+    update_interval: 2s
+    lambda: return id(rinnai_p1_bytes_since_boot);
+
+  - platform: template
+    name: P2 bytes desde boot
+    id: rinnai_p2_bytes
+    entity_category: diagnostic
+    icon: mdi:counter
+    unit_of_measurement: B
+    accuracy_decimals: 0
+    state_class: total_increasing
+    update_interval: 2s
+    lambda: return id(rinnai_p2_bytes_since_boot);
+
+text_sensor:
+  - platform: debug
+    device:
+      name: Informacoes do ESP
+      id: rinnai_device_info
+    reset_reason:
+      name: Motivo do ultimo reset
+      id: rinnai_reset_reason
+
+  - platform: wifi_info
+    ip_address:
+      name: IP da rede Wi-Fi
+      id: rinnai_station_ip
+    ssid:
+      name: Rede Wi-Fi conectada
+      id: rinnai_station_ssid
+    mac_address:
+      name: MAC do ESP
+      id: rinnai_mac
+
+  - platform: version
+    name: Versao ESPHome
+    id: rinnai_esphome_version
+    hide_timestamp: true
+    hide_hash: true
+
+  - platform: template
+    name: Versao do firmware
+    id: rinnai_firmware_version
+    entity_category: diagnostic
+    update_interval: 60s
+    lambda: |-
+      #ifdef ESPHOME_PROJECT_VERSION
+      return {ESPHOME_PROJECT_VERSION};
+      #else
+      return {"sem versao de projeto"};
+      #endif
+
+  - platform: template
+    name: IP do ponto de acesso
+    entity_category: diagnostic
+    update_interval: 60s
+    lambda: return {"192.168.4.1"};
+
+  - platform: template
+    name: P1 ultimo bloco hexadecimal
+    id: rinnai_p1_last_block
+    entity_category: diagnostic
+    update_interval: never
+
+  - platform: template
+    name: P2 ultimo bloco hexadecimal
+    id: rinnai_p2_last_block
+    entity_category: diagnostic
+    update_interval: never

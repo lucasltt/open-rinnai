@@ -1,0 +1,185 @@
+globals:
+  - id: rinnai_poll_position
+    type: uint8_t
+    restore_value: false
+    initial_value: '0'
+
+switch:
+  - platform: template
+    name: Leitura automatica do aquecedor
+    id: rinnai_auto_poll
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    icon: mdi:sync
+
+uart:
+  - id: !extend rinnai_pin2_rx
+    debug:
+      sequence:
+        - lambda: |-
+            for (const auto &reading : rinnai_telemetry::feed(bytes)) {
+              auto hex_digit = [](char c) -> int {
+                if (c >= '0' && c <= '9') return c - '0';
+                if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+                return c - 'a' + 10;
+              };
+              switch (reading.address) {
+                case 0x0604: id(rinnai_outlet_temperature).publish_state(reading.raw / 100.0f); break;
+                case 0x0606: id(rinnai_inlet_temperature).publish_state(reading.raw / 100.0f); break;
+                case 0x0608: id(rinnai_water_flow).publish_state(reading.raw / 100.0f); break;
+                case 0x0648: id(rinnai_reported_power).publish_state(reading.raw / 10.0f); break;
+                case 0x060E: id(rinnai_setpoint_index).publish_state(reading.raw & 0xFF); break;
+                case 0x0614:
+                  id(rinnai_error_code).publish_state(10 * hex_digit(reading.data_hex[3]) + hex_digit(reading.data_hex[0]));
+                  id(rinnai_error_raw).publish_state(reading.data_hex);
+                  break;
+                case 0x0611:
+                  id(rinnai_raw_state).publish_state(10 * hex_digit(reading.data_hex[0]) + hex_digit(reading.data_hex[3]));
+                  break;
+                case 0x060F:
+                  id(rinnai_flame_reported).publish_state(hex_digit(reading.data_hex[1]) == 1);
+                  break;
+              }
+              char text[96];
+              snprintf(text, sizeof(text), "%04X: %s; resposta em %u ms", reading.address,
+                       reading.data_hex.c_str(), static_cast<unsigned>(reading.rtt_ms));
+              id(rinnai_last_verified_read).publish_state(text);
+              ESP_LOGI("rinnai.sensor", "%s", text);
+            }
+
+interval:
+  - id: rinnai_background_poll
+    interval: 2s
+    then:
+      - lambda: |-
+          if (!id(rinnai_auto_poll).state || rinnai_telemetry::pending() || rinnai_telemetry::background_paused()) return;
+          static constexpr uint16_t addresses[] = {0x0604, 0x0606, 0x0608, 0x0648, 0x060E, 0x0614, 0x0611, 0x060F};
+          const uint16_t address = addresses[id(rinnai_poll_position) % 8];
+          id(rinnai_poll_position) = (id(rinnai_poll_position) + 1) % 8;
+          rinnai_telemetry::request_started(address);
+          const std::string outcome = rinnai_read_query::run_register(0, address);
+          id(rinnai_last_poll_result).publish_state(outcome);
+          if (outcome.rfind("OK", 0) != 0) {
+            ESP_LOGW("rinnai.poll", "%s; leitura automatica interrompida", outcome.c_str());
+            id(rinnai_auto_poll).turn_off();
+          }
+  - interval: 100ms
+    then:
+      - lambda: |-
+          if (rinnai_telemetry::timeout_check())
+            ESP_LOGW("rinnai.poll", "Sem resposta valida dentro de 500 ms");
+  - interval: 10s
+    then:
+      - lambda: |-
+          const auto now = millis();
+          if (rinnai_telemetry::last_seen(0x0604) && now - rinnai_telemetry::last_seen(0x0604) > 60000U)
+            id(rinnai_outlet_temperature).publish_state(NAN);
+          if (rinnai_telemetry::last_seen(0x0606) && now - rinnai_telemetry::last_seen(0x0606) > 60000U)
+            id(rinnai_inlet_temperature).publish_state(NAN);
+          if (rinnai_telemetry::last_seen(0x0608) && now - rinnai_telemetry::last_seen(0x0608) > 60000U)
+            id(rinnai_water_flow).publish_state(NAN);
+          if (rinnai_telemetry::last_seen(0x0648) && now - rinnai_telemetry::last_seen(0x0648) > 60000U)
+            id(rinnai_reported_power).publish_state(NAN);
+
+sensor:
+  - platform: template
+    name: Temperatura de entrada
+    id: rinnai_inlet_temperature
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    accuracy_decimals: 2
+    update_interval: never
+  - platform: template
+    name: Temperatura de saida
+    id: rinnai_outlet_temperature
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    accuracy_decimals: 2
+    update_interval: never
+  - platform: template
+    name: Vazao de agua
+    id: rinnai_water_flow
+    unit_of_measurement: L/min
+    state_class: measurement
+    accuracy_decimals: 2
+    update_interval: never
+  - platform: template
+    name: Potencia informada pelo aquecedor
+    id: rinnai_reported_power
+    unit_of_measurement: kcal/min
+    state_class: measurement
+    accuracy_decimals: 1
+    update_interval: never
+  - platform: template
+    name: Indice da temperatura ajustada
+    id: rinnai_setpoint_index
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    name: Codigo de erro
+    id: rinnai_error_code
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    name: Estado bruto do aquecedor
+    id: rinnai_raw_state
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    name: Quadros validos do aquecedor
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    state_class: total_increasing
+    update_interval: 5s
+    lambda: return rinnai_telemetry::valid_frames();
+  - platform: template
+    name: Quadros rejeitados do aquecedor
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: 5s
+    lambda: return rinnai_telemetry::bad_frames();
+  - platform: template
+    name: Consultas sem resposta
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: 5s
+    lambda: return rinnai_telemetry::timeouts();
+  - platform: template
+    name: Tempo da resposta do aquecedor
+    entity_category: diagnostic
+    unit_of_measurement: ms
+    accuracy_decimals: 0
+    update_interval: 5s
+    lambda: return rinnai_telemetry::last_rtt_ms();
+
+binary_sensor:
+  - platform: template
+    name: Comunicacao com o aquecedor
+    device_class: connectivity
+    lambda: return rinnai_telemetry::last_valid_ms() != 0 && millis() - rinnai_telemetry::last_valid_ms() < 30000U;
+  - platform: template
+    name: Chama informada pelo aquecedor
+    id: rinnai_flame_reported
+    icon: mdi:fire
+
+text_sensor:
+  - platform: template
+    name: Ultima leitura verificada
+    id: rinnai_last_verified_read
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: Ultima consulta automatica
+    id: rinnai_last_poll_result
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: Registro de erro bruto
+    id: rinnai_error_raw
+    entity_category: diagnostic
+    update_interval: never

@@ -1,0 +1,61 @@
+packages:
+  telemetry: !include rinnai-telemetry-wroom32.yaml
+  temperature_control: !include packages/temperature_control.yaml
+  dashboard: !include packages/smart_dashboard.yaml
+
+esphome:
+  comment: Controle local confirmado por leitura e telemetria Rinnai REU-E211.
+  on_shutdown:
+    then:
+      - lambda: |-
+          rinnai_storage::periods.observe(heater_stats::totals(), rinnai_storage::epoch_now());
+          rinnai_storage::save_totals(true);
+          rinnai_storage::save_health();
+  project:
+    version: 1.2.0
+  includes:
+    - heater_control.h
+    - heater_stats.h
+    - heater_history.h
+    - heater_sessions.h
+    - heater_periods.h
+    - heater_health.h
+    - heater_runtime.h
+    - heater_storage.h
+    - heater_diagnostics.h
+    - dashboard/favicon_asset.h
+    - dashboard/pwa_assets.h
+    - dashboard_history_json.h
+    - api_command.h
+    - api_requests.h
+    - api_assets.h
+    - dashboard_backend.h
+
+web_server:
+  auth: !remove
+  local: false
+  js_url: ""
+  css_url: ""
+  js_include: dashboard/dashboard.js
+  css_include: dashboard/dashboard.css
+
+# The local dashboard is open; firmware updates use the native OTA password.
+ota:
+  - id: !remove rinnai_web_ota
+
+logger:
+  on_message:
+    - level: ERROR
+      then:
+        - lambda: rinnai_diagnostics::receive_log(nullptr, level, tag, message, std::strlen(message));
+
+time:
+  - platform: sntp
+    id: rinnai_clock
+    timezone: America/Sao_Paulo
+
+button:
+  - platform: restart
+    name: Reiniciar modulo Wi-Fi
+    id: rinnai_restart
+    entity_category: diagnostic

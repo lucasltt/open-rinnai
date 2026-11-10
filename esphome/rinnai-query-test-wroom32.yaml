@@ -1,0 +1,12 @@
+# Experimental one-shot reads. Output is disabled at boot and requires an
+# explicit short-lived API arm after the two 1k series resistors are installed.
+packages:
+  receiver: !include rinnai-sniffer-wroom32.yaml
+  active_read_test: !include packages/active_reads.yaml
+
+esphome:
+  comment: Diagnostico e consultas de temperatura sob gatilho explicito.
+  project:
+    version: 0.4.1
+  includes:
+    - read_query_test.h

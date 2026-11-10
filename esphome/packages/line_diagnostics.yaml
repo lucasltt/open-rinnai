@@ -1,0 +1,95 @@
+# Input-only diagnostics; GPIO state is not a voltage measurement.
+esphome:
+  on_boot:
+    - priority: -100
+      then:
+        - lambda: |-
+            rinnai_diag::begin();
+            id(rinnai_line_status).publish_state(rinnai_diag::status());
+            id(rinnai_rx_settings).publish_state("9600 8N1 normal");
+
+api:
+  # Keep typed API action helpers in the ESPHome 2026.6.5 source filter.
+  custom_services: true
+  actions:
+    - action: autoteste_recepcao
+      then:
+        - lambda: |-
+            rinnai_rx::configure(id(rinnai_pin1_rx), id(rinnai_pin2_rx), 9600, false, 0, 1);
+            id(rinnai_p1_selftest).publish_state(rinnai_rx_selftest::run(UART_NUM_1, 25));
+            id(rinnai_p2_selftest).publish_state(rinnai_rx_selftest::run(UART_NUM_2, 26));
+            id(rinnai_rx_settings).publish_state("9600 8N1 normal");
+    - action: configurar_recepcao
+      variables:
+        baud: int
+        inverted: bool
+        parity: int
+        stops: int
+      then:
+        - lambda: |-
+            if (rinnai_rx::configure(id(rinnai_pin1_rx), id(rinnai_pin2_rx), baud, inverted, parity, stops)) {
+              char description[64];
+              snprintf(description, sizeof(description), "%d 8%c%d %s", baud,
+                       parity == 1 ? 'E' : parity == 2 ? 'O' : 'N', stops,
+                       inverted ? "invertido" : "normal");
+              id(rinnai_rx_settings).publish_state(description);
+            } else {
+              id(rinnai_rx_settings).publish_state("ERRO ao configurar RX; conferir logs");
+            }
+
+sensor:
+  - platform: template
+    name: P1 nivel digital
+    id: rinnai_p1_level
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: 1s
+    lambda: return rinnai_diag::level(0);
+  - platform: template
+    name: P2 nivel digital
+    id: rinnai_p2_level
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: 1s
+    lambda: return rinnai_diag::level(1);
+  - platform: template
+    name: P1 bordas desde boot
+    id: rinnai_p1_edges
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    state_class: total_increasing
+    update_interval: 2s
+    lambda: return rinnai_diag::edges(0);
+  - platform: template
+    name: P2 bordas desde boot
+    id: rinnai_p2_edges
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    state_class: total_increasing
+    update_interval: 2s
+    lambda: return rinnai_diag::edges(1);
+
+text_sensor:
+  - platform: template
+    name: Diagnostico das linhas
+    id: rinnai_line_status
+    entity_category: diagnostic
+    update_interval: 10s
+    lambda: |-
+      rinnai_diag::update();
+      return {rinnai_diag::status()};
+  - platform: template
+    name: Configuracao RX em teste
+    id: rinnai_rx_settings
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: P1 autoteste interno RX
+    id: rinnai_p1_selftest
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: P2 autoteste interno RX
+    id: rinnai_p2_selftest
+    entity_category: diagnostic
+    update_interval: never

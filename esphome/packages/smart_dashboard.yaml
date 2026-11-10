@@ -1,0 +1,167 @@
+esphome:
+  on_boot:
+    - priority: -130
+      then:
+        - lambda: rinnai_storage::begin(static_cast<uint32_t>(esp_reset_reason()));
+    - priority: -135
+      then:
+        - lambda: rinnai_diagnostics::begin();
+    - priority: -140
+      then:
+        - lambda: rinnai_dashboard::backend().begin();
+
+interval:
+  - interval: 100ms
+    then:
+      - lambda: |-
+          if (rinnai_dashboard::backend().take_cancel()) {
+            if (rinnai_smart::controller.busy()) rinnai_smart::controller.cancel();
+            rinnai_telemetry::set_background_paused(rinnai_smart::controller.busy());
+          }
+          const int target = rinnai_dashboard::backend().take_target();
+          if (target) {
+            const bool accepted = rinnai_smart::controller.target_request(target, millis());
+            rinnai_dashboard::backend().note_target_started(accepted);
+            rinnai_telemetry::set_background_paused(rinnai_smart::controller.busy());
+          }
+          rinnai_dashboard::SettingsRequest request;
+          if (rinnai_dashboard::backend().take_settings(request)) {
+            heater_stats::Settings settings;
+            settings.gas_type = request.glp ? heater_stats::GasType::GLP : heater_stats::GasType::GN;
+            settings.gas_tariff_per_unit = request.gas_tariff;
+            settings.water_tariff_per_m3 = request.water_tariff;
+            if (!rinnai_storage::configure(settings)) ESP_LOGW("rinnai.storage", "Falha ao persistir tarifas");
+          }
+          heater_health::Settings preferences;
+          if (rinnai_dashboard::backend().take_preferences(preferences) &&
+              !rinnai_storage::configure_preferences(preferences))
+            ESP_LOGW("rinnai.storage", "Falha ao persistir favoritos e avisos");
+          if (rinnai_dashboard::backend().take_restart_request(millis())) App.safe_reboot();
+  - interval: 1s
+    then:
+      - lambda: |-
+          heater_stats::tick();
+          const bool ended = heater_stats::take_session_finished();
+          if (ended && !rinnai_storage::history.add(
+              heater_stats::recent_session(heater_stats::recent_session_count() - 1), millis(), rinnai_storage::epoch_now()))
+            ESP_LOGW("rinnai.storage", "Uso concluido nao pode ser arquivado");
+          const bool dated = rinnai_storage::history.synchronize_clock(millis(), rinnai_storage::epoch_now());
+          rinnai_storage::periods.observe(heater_stats::totals(), rinnai_storage::epoch_now());
+          const bool boot_dated = rinnai_storage::health.synchronize_clock(millis(), rinnai_storage::epoch_now());
+          static uint8_t health_retry = 0;
+          if (boot_dated || (!rinnai_storage::health_storage_ok && (++health_retry % 10) == 0))
+            rinnai_storage::save_health(true);
+          if (!rinnai_storage::save_totals(ended || dated)) ESP_LOGW("rinnai.storage", "Falha ao persistir acumulados e usos");
+          const auto totals = heater_stats::totals();
+          const auto current = heater_stats::current_session();
+          const auto estimate = heater_stats::estimate(totals.water_l, totals.energy_kwh);
+          id(rinnai_total_water).publish_state(totals.water_l);
+          id(rinnai_total_energy).publish_state(totals.energy_kwh);
+          id(rinnai_total_heating_time).publish_state(totals.heating_seconds);
+          id(rinnai_session_count).publish_state(totals.sessions);
+          id(rinnai_current_duration).publish_state(current.active ? current.duration_ms / 1000.0 : 0);
+          id(rinnai_total_gas).publish_state(heater_stats::settings().gas_type == heater_stats::GasType::GN ? estimate.gas_units : NAN);
+          id(rinnai_total_glp).publish_state(heater_stats::settings().gas_type == heater_stats::GasType::GLP ? estimate.gas_units : NAN);
+          id(rinnai_total_cost).publish_state(rinnai_dashboard::available_cost(estimate));
+          const auto now = millis();
+          auto fresh = [now](uint16_t address, double value) {
+            const auto seen = rinnai_telemetry::last_seen(address);
+            return seen && now - seen < 30000U ? value : NAN;
+          };
+          rinnai_dashboard::Live live;
+          live.version = ESPHOME_PROJECT_VERSION;
+          live.online = rinnai_telemetry::last_valid_ms() && now - rinnai_telemetry::last_valid_ms() < 15000U;
+          live.heating = fresh(0x060F, id(rinnai_flame_reported).state) > 0.5;
+          live.inlet_c = fresh(0x0606, id(rinnai_inlet_temperature).state);
+          live.outlet_c = fresh(0x0604, id(rinnai_outlet_temperature).state);
+          live.flow_l_min = fresh(0x0608, id(rinnai_water_flow).state);
+          live.power_kcal_min = fresh(0x0648, id(rinnai_reported_power).state);
+          live.rssi_dbm = id(rinnai_wifi_signal).state;
+          live.heap_bytes = esp_get_free_heap_size();
+          live.storage_ok = rinnai_storage::storage_ok && rinnai_storage::session_storage_ok && rinnai_storage::health_storage_ok &&
+              rinnai_storage::preferences_storage_ok && rinnai_diagnostics::storage_ok;
+          live.archive_loaded = rinnai_storage::archive_loaded;
+          live.uptime_ms = now;
+          live.latency_ms = rinnai_telemetry::last_rtt_ms();
+          live.valid_frames = rinnai_telemetry::valid_frames();
+          live.timeouts = rinnai_telemetry::timeouts();
+          live.bad_frames = rinnai_telemetry::bad_frames();
+          live.last_seen_ms = rinnai_telemetry::last_valid_ms();
+          const auto error_seen = rinnai_telemetry::last_seen(0x0614);
+          const bool error_fresh = error_seen && now - error_seen < 15000U &&
+              id(rinnai_error_code).has_state() && std::isfinite(id(rinnai_error_code).state);
+          live.error_code = error_fresh ? static_cast<int>(id(rinnai_error_code).state) : -1;
+          heater_health::Metrics metrics;
+          metrics.online = live.online;
+          metrics.ever_seen = live.last_seen_ms != 0;
+          metrics.last_valid_ms = live.last_seen_ms;
+          metrics.error_known = error_fresh;
+          metrics.error_code = live.error_code >= 0 ? static_cast<uint16_t>(live.error_code) : 0;
+          metrics.flow_fresh = std::isfinite(live.flow_l_min);
+          metrics.session = current;
+          rinnai_storage::health.update(now, metrics);
+          live.controls_ready = live.online && live.error_code == 0 && !rinnai_smart::controller.busy() &&
+              rinnai_smart::controller.actual_celsius() >= 35 && rinnai_smart::controller.index_age_ms(now) < 15000U;
+          static uint8_t history_tick = 0;
+          rinnai_dashboard::backend().refresh(live, (++history_tick % 10) == 1 || ended);
+
+sensor:
+  - platform: template
+    name: Agua acumulada estimada
+    id: rinnai_total_water
+    unit_of_measurement: L
+    device_class: water
+    state_class: total_increasing
+    accuracy_decimals: 2
+    update_interval: never
+  - platform: template
+    name: Energia acumulada estimada
+    id: rinnai_total_energy
+    unit_of_measurement: kWh
+    device_class: energy
+    state_class: total_increasing
+    accuracy_decimals: 4
+    update_interval: never
+  - platform: template
+    name: GN acumulado estimado
+    id: rinnai_total_gas
+    unit_of_measurement: "m³"
+    device_class: gas
+    state_class: total_increasing
+    accuracy_decimals: 4
+    update_interval: never
+  - platform: template
+    name: GLP acumulado estimado
+    id: rinnai_total_glp
+    unit_of_measurement: kg
+    state_class: total_increasing
+    accuracy_decimals: 4
+    update_interval: never
+  - platform: template
+    name: Custo acumulado estimado
+    id: rinnai_total_cost
+    unit_of_measurement: BRL
+    accuracy_decimals: 2
+    update_interval: never
+  - platform: template
+    name: Tempo acumulado aquecendo
+    id: rinnai_total_heating_time
+    unit_of_measurement: s
+    device_class: duration
+    state_class: total_increasing
+    accuracy_decimals: 0
+    update_interval: never
+  - platform: template
+    name: Usos registrados
+    id: rinnai_session_count
+    accuracy_decimals: 0
+    state_class: total_increasing
+    update_interval: never
+  - platform: template
+    name: Duracao do uso atual
+    id: rinnai_current_duration
+    unit_of_measurement: s
+    device_class: duration
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: never

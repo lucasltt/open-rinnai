@@ -1,0 +1,8 @@
+# Copie para rinnai-local.yaml antes da primeira gravação.
+# Mantém a configuração smart e habilita consultas em uma NVS nova.
+packages:
+  controller: !include rinnai-smart-wroom32.yaml
+
+switch:
+  - id: !extend rinnai_auto_poll
+    restore_mode: RESTORE_DEFAULT_ON

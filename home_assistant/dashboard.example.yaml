@@ -1,0 +1,39 @@
+# Exemplo com os nomes padrão desta configuração. Confira os IDs na sua instalação.
+title: Água quente
+views:
+  - title: Controle e histórico
+    path: agua-quente
+    type: masonry
+    cards:
+      - type: entities
+        title: Aquecedor
+        show_header_toggle: false
+        entities:
+          - entity: number.rinnai_sniffer_temperatura_ajustada
+            name: Temperatura desejada
+          - entity: sensor.rinnai_sniffer_temperatura_de_saida
+            name: Temperatura de saída
+          - entity: sensor.rinnai_sniffer_vazao_de_agua
+            name: Vazão
+      - type: calendar
+        title: Usos de água quente
+        initial_view: dayGridMonth
+        entities:
+          - calendar.historico_rinnai_usos_de_agua_quente
+      - type: entities
+        title: Último uso
+        entities:
+          - sensor.historico_rinnai_ultimo_uso_termino
+          - sensor.historico_rinnai_ultimo_uso_duracao
+          - sensor.historico_rinnai_ultimo_uso_agua
+          - sensor.historico_rinnai_ultimo_uso_custo_agua
+          - sensor.historico_rinnai_ultimo_uso_custo_gas
+          - sensor.historico_rinnai_ultimo_uso_custo_total
+      - type: entities
+        title: Arquivo e cobertura
+        entities:
+          - sensor.historico_rinnai_usos_arquivados
+          - sensor.historico_rinnai_estado_da_sincronizacao
+          - sensor.historico_rinnai_usos_perdidos_apos_sincronizacao
+          - sensor.historico_rinnai_usos_anteriores_indisponiveis
+          - sensor.historico_rinnai_usos_sem_horario

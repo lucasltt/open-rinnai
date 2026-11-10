@@ -1,0 +1,31 @@
+/* Installation controls use the existing dashboard palette and stay unobtrusive. */
+.rinnai-pwa-entry{display:flex;justify-content:flex-end;margin:18px 2px 0}
+.rinnai-pwa-trigger{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;max-width:100%;padding:9px 14px;border:1px solid var(--line,#e5e8e7);border-radius:12px;background:#ffffffa8;color:var(--ink,#192a38);font-size:12px;font-weight:600;line-height:1.5;cursor:pointer}
+.rinnai-pwa-trigger:hover{background:#fff}
+.rinnai-pwa-trigger svg{width:18px;height:18px;flex:none}
+dialog.rinnai-pwa-dialog{box-sizing:border-box;width:min(480px,calc(100vw - 36px));max-width:calc(100vw - 36px);max-height:90vh;max-height:90dvh;margin:auto;padding:0;overflow:auto;overscroll-behavior:contain;border:1px solid var(--line,#e5e8e7);border-radius:23px;background:#fff;color:var(--ink,#192a38);box-shadow:0 30px 100px #142c3833;font:inherit}
+.rinnai-pwa-dialog::backdrop{background:#172d4166;backdrop-filter:blur(4px)}
+.rinnai-pwa-heading{position:sticky;top:0;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:25px 25px 19px;border-bottom:1px solid var(--line,#e5e8e7);background:#fff}
+.rinnai-pwa-heading h2{margin:0;font-size:20px;line-height:1.25;font-weight:650;letter-spacing:-.6px}
+.rinnai-pwa-heading p{margin:7px 0 0;color:var(--muted,#6c7881);font-size:12px;line-height:1.6}
+.rinnai-pwa-close{display:grid;place-items:center;flex:none;width:42px;height:42px;margin:-5px -7px 0 0;padding:0;border:1px solid var(--line,#e5e8e7);border-radius:50%;background:#fff;color:var(--ink,#192a38);cursor:pointer}
+.rinnai-pwa-close svg{width:18px;height:18px}
+.rinnai-pwa-body{padding:21px 25px 25px;overflow-wrap:anywhere}
+.rinnai-pwa-status{margin:0 0 19px;padding:12px 14px;border:1px solid #eadfd5;border-radius:12px;background:#fff8ef;color:#82654a;font-size:12px;line-height:1.7}
+.rinnai-pwa-status.installed{border-color:#c9e5dc;background:#f1faf5;color:#25705f}
+.rinnai-pwa-native-install{display:block;width:100%;min-height:44px;margin:0 0 19px;padding:12px 16px;border:0;border-radius:11px;background:var(--ink,#192a38);color:#fff;font:inherit;font-size:13px;font-weight:600;line-height:1.5;cursor:pointer}
+.rinnai-pwa-native-install:hover:enabled{background:#304858}
+.rinnai-pwa-native-install:disabled{cursor:wait;opacity:.6}
+.rinnai-pwa-address{display:inline-flex;align-items:center;min-height:44px;margin:0 0 18px;color:var(--teal,#257e7b);font-size:13px;line-height:1.5;text-decoration:underline;text-underline-offset:3px}
+.rinnai-pwa-guide h3{margin:0 0 13px;font-size:14px;font-weight:650;line-height:1.5}
+.rinnai-pwa-guide ol{margin:0;padding-left:22px}
+.rinnai-pwa-guide li{margin:0 0 11px;padding-left:3px;color:#53636c;font-size:13px;line-height:1.7}
+.rinnai-pwa-guide li::marker{color:#b86840;font-weight:650}
+.rinnai-pwa-android{margin-top:19px;padding-top:16px;border-top:1px solid var(--line,#e5e8e7)}
+.rinnai-pwa-android summary{padding:5px 0;cursor:pointer;color:var(--muted,#6c7881);font-size:12px;font-weight:550;line-height:1.6}
+.rinnai-pwa-android .rinnai-pwa-guide{padding-top:15px}
+.rinnai-pwa-note{margin:18px 0 0;color:var(--muted,#6c7881);font-size:11px;line-height:1.7}
+.rinnai-pwa-offline{margin:15px 0 0;padding:12px 14px;border:1px solid #ebc5bd;border-radius:12px;background:#fff0ed;color:#a1493c;font-size:12px;line-height:1.7}
+.rinnai-pwa-dialog [hidden],.rinnai-pwa-entry[hidden]{display:none!important}
+.rinnai-pwa-trigger:focus-visible,.rinnai-pwa-close:focus-visible,.rinnai-pwa-native-install:focus-visible,.rinnai-pwa-address:focus-visible,.rinnai-pwa-android summary:focus-visible{outline:3px solid #ea9a56;outline-offset:4px}
+@media(max-width:760px){.rinnai-pwa-entry{justify-content:flex-start;margin-top:16px}.rinnai-pwa-heading{padding:23px 20px 18px}.rinnai-pwa-body{padding:19px 20px 23px}.rinnai-pwa-heading h2{font-size:19px}.rinnai-pwa-guide li{font-size:14px}}

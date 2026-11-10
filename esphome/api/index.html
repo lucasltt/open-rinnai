@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#192a38">
+  <title>API local · Aquecedor</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <style>
+    :root{color-scheme:light;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#192a38;background:#f5f5f0;line-height:1.6;font-size:15px;--muted:#60717b;--line:#e5e8e7;--orange:#ed753f}*{box-sizing:border-box}body{margin:0}a{color:#216f72;text-underline-offset:3px}a:hover{color:#174f52}a:focus-visible,summary:focus-visible{outline:3px solid #ed753f;outline-offset:4px}main{max-width:1100px;margin:auto;padding:28px 24px 54px}header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:38px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#192a38;font-weight:750}.brand img{width:40px;height:40px}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:1.3px;text-transform:uppercase;font-weight:600}.nav{display:flex;gap:18px;flex-wrap:wrap;justify-content:flex-end;font-size:13px}.badge{display:inline-block;border-radius:99px;background:#fff0e5;color:#a54f28;font-size:11px;font-weight:750;letter-spacing:.5px;padding:4px 10px}h1{font-size:clamp(29px,5vw,44px);line-height:1.13;letter-spacing:-1.5px;margin:13px 0}h2{font-size:21px;letter-spacing:-.5px;line-height:1.25;margin:0 0 12px}h3{font-size:15px;margin:22px 0 8px}p{margin:8px 0 14px}.intro{max-width:780px;color:var(--muted);font-size:16px}.base{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin:24px 0 30px}.base span{font-size:12px;color:var(--muted)}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.88em;overflow-wrap:anywhere}p code,li code,dd code{padding:2px 5px;border-radius:5px;background:#eef1ef}.base code{background:#192a38;color:white;border-radius:10px;padding:10px 14px;max-width:100%}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.card{min-width:0;padding:25px;background:white;border:1px solid #e9ebe7;border-radius:20px;margin-bottom:20px}.grid>.card{margin-bottom:0}.section{margin-top:28px}.note{border-left:3px solid var(--orange);padding:5px 0 5px 14px;color:var(--muted);font-size:13px}.endpoint{display:grid;grid-template-columns:45px minmax(0,1fr);gap:2px 12px;padding:13px 0;border-top:1px solid var(--line);align-items:start}.endpoint:first-of-type{border-top:0}.method{font:750 10px ui-monospace,SFMono-Regular,Consolas,monospace;border-radius:5px;background:#eaf5ef;color:#246b4c;text-align:center;padding:4px 1px;margin-top:1px}.method.post{background:#fff0e5;color:#a54f28}.endpoint .path{font:600 12px ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}.endpoint p{grid-column:2;margin:1px 0 0;color:var(--muted);font-size:12px}.endpoint p code{background:none;padding:0}pre{max-width:100%;overflow:auto;background:#192a38;color:#e7eff0;border-radius:12px;padding:16px;margin:14px 0;font-size:12px;line-height:1.65}pre code{overflow-wrap:normal;font-size:inherit;white-space:pre}.hint{color:var(--muted);font-size:12px}ul,ol{padding-left:22px}li{margin:7px 0}details{border-top:1px solid var(--line);margin-top:18px;padding-top:14px}summary{cursor:pointer;font-weight:650;font-size:14px}.codes{display:grid;grid-template-columns:55px minmax(0,1fr);gap:8px 12px;font-size:13px}.codes dt{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:700}.codes dd{margin:0;color:var(--muted)}footer{color:var(--muted);font-size:12px;margin-top:32px;border-top:1px solid var(--line);padding-top:18px}@media(max-width:720px){main{padding:20px 14px 36px}.grid{grid-template-columns:1fr}.card{padding:20px}header{align-items:flex-start;margin-bottom:28px}.nav{gap:10px;font-size:12px;max-width:145px}.intro{font-size:15px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <a class="brand" href="/app"><img src="/favicon.svg" alt=""><span>Aquecedor<small>Rinnai · controle local</small></span></a>
+    <nav class="nav" aria-label="Documentação"><a href="/app">Voltar ao painel</a><a href="/api/openapi.json" download="rinnai-openapi.json">OpenAPI JSON</a></nav>
+  </header>
+  <span class="badge">API v1 · JSON</span>
+  <p class="note"><strong>Documentação da API v1 · firmware 1.2.0.</strong> Os endpoints básicos existem desde 1.1.0. A coleção durável <code>/sessions</code> exige 1.2.0 e <code>capabilities.completed_sessions</code>. Confira a versão instalada.</p>
+  <h1>Seu aquecedor, conectado.</h1>
+  <p class="intro">Leia os sensores, acompanhe os usos e envie ajustes pela rede local. Esta API atende integrações próprias, um futuro visor remoto e ferramentas que entendam OpenAPI.</p>
+  <div class="base"><span>Endereço base · substitua o IP de exemplo pelo IP do seu ESP32</span><code>http://192.168.1.50/api/v1</code></div>
+
+  <section class="grid" aria-label="Como usar">
+    <article class="card"><h2>Leituras atuais</h2><p>Comece por <a href="/api/v1/state"><code>GET /state</code></a>. Para um visor pequeno, <a href="/api/v1/telemetry"><code>GET /telemetry</code></a> reúne a telemetria.</p><p class="note">Verifique <code>online</code> e <code>readings.*.stale</code>. Uma temperatura ajustada ainda numérica pode ser antiga. <code>null</code> significa informação indisponível; não deve virar zero.</p><p class="hint">Sugestão: estado a cada 2 segundos; histórico, períodos e diagnóstico a cada 10 segundos ou mais.</p></article>
+    <article class="card"><h2>Comandos confirmados</h2><p>Envie <code>POST</code> com <code>Content-Type: application/json</code> e corpo de até <strong>2048 bytes</strong>. Os campos e tipos devem corresponder ao contrato.</p><p class="note"><strong>202 significa aceito, ainda em processamento.</strong> Consulte o estado do controle e compare <code>boot_id</code> e <code>command_id</code> com a resposta recebida.</p><p class="hint">A temperatura é um alvo absoluto de 35 a 50 °C. Um comando em andamento ocupa a fila; outro pedido pode retornar 409.</p></article>
+  </section>
+
+  <section class="card section" aria-labelledby="read-title">
+    <h2 id="read-title">Consultar</h2>
+    <div class="endpoint"><span class="method">GET</span><a class="path" href="/api/v1">/api/v1</a><p>Índice da API e caminhos disponíveis.</p></div>
+    <div class="endpoint"><span class="method">GET</span><a class="path" href="/api/v1/capabilities">/api/v1/capabilities</a><p>Capacidades, limites e recursos suportados pelo módulo.</p></div>
+    <div class="endpoint"><span class="method">GET</span><a class="path" href="/api/v1/state">/api/v1/state</a><p>Estado completo: temperaturas, vazão, potência, chama, uso atual, consumos, configurações e avisos.</p></div>
+    <div class="endpoint"><span class="method">GET</span><a class="path" href="/api/v1/telemetry">/api/v1/telemetry</a><p>Telemetria para consulta por outros dispositivos, com indicação de atualidade.</p></div>
+    <div class="endpoint"><span class="method">GET</span><a class="path" href="/api/v1/settings">/api/v1/settings</a><p>Tipo de gás, tarifas, três favoritos e opções dos avisos.</p></div>
+    <div class="endpoint"><span class="method">GET</span><a class="path" href="/api/v1/control">/api/v1/control</a><p>Acompanhamento do último ajuste HTTP. Resultados: <code>idle</code>, <code>queued</code>, <code>running</code>, <code>confirmed</code>, <code>failed</code> ou <code>cancelled</code>.</p></div>
+    <div class="endpoint"><span class="method">GET</span><a class="path" href="/api/v1/history">/api/v1/history</a><p>Até 720 amostras compactas de 24 horas e 24 usos concluídos. As amostras ficam em RAM; os usos são preservados após reiniciar.</p></div>
+    <div class="endpoint"><span class="method">GET</span><a class="path" href="/api/v1/sessions">/api/v1/sessions</a><p>Desde 1.2.0: até 24 usos de um checkpoint confirmado na flash, mais antigos primeiro, com <code>device_id</code>, <code>stream_id</code> e ID por registro. Sem os pontos de gráfico; indicado para sincronização persistente.</p></div>
+    <div class="endpoint"><span class="method">GET</span><a class="path" href="/api/v1/periods">/api/v1/periods</a><p>Resumos de até 31 dias e 12 meses. Datas em UTC−3; intervalos incompletos têm indicação de período parcial.</p></div>
+    <div class="endpoint"><span class="method">GET</span><a class="path" href="/api/v1/diagnostics">/api/v1/diagnostics</a><p>Comunicação, memória, armazenamento, inicializações e registro disponível da última falha.</p></div>
+    <div class="endpoint"><span class="method">GET</span><a class="path" href="/api/v1/health">/api/v1/health</a><p>Saúde do módulo: HTTP 200 quando os requisitos de comunicação e armazenamento estão atendidos; 503 quando indisponível.</p></div>
+  </section>
+
+  <section class="card" aria-labelledby="sync-title">
+    <h2 id="sync-title">Histórico por uso, com identidade durável</h2>
+    <p><code>GET /sessions</code> reúne somente os usos concluídos cuja gravação foi confirmada. Consulte a cada dez segundos ou mais. O ID de um uso é <code>stream_id:sequence</code>; horários e tarifas não fazem parte da identidade.</p>
+    <p>O cliente deve validar e salvar o snapshot antes de avançar seu cursor. HTTP 503, falha de disco ou conteúdo inconsistente mantêm o cursor anterior. Uma correção de relógio pode completar datas do mesmo registro, sem criar outro uso.</p>
+    <p class="note">Os 24 registros do ESP são um buffer de recuperação. Se houver mais acionamentos durante uma desconexão, os antigos podem ser sobrescritos. Compare as sequências e sinalize lacunas; não invente os usos ausentes nem um início desconhecido.</p>
+    <p class="hint"><code>pricing_basis=current_settings</code>: custos desta resposta usam as tarifas atuais. Um arquivo permanente deve registrar a base de preço utilizada. A integração Rinnai Local conserva tarifas/custos da primeira importação, sem reprecificar o passado.</p>
+  </section>
+
+  <section class="card" aria-labelledby="cost-title">
+    <h2 id="cost-title">Água e gás separados</h2>
+    <p>Os totalizadores, o uso atual e os resumos de períodos informam <code>water_cost</code> e <code>gas_cost</code> em R$. As parcelas usam o consumo estimado e as tarifas atuais; <code>cost</code> é a soma das parcelas disponíveis.</p>
+    <p class="hint">Uma parcela sem tarifa informada é <code>null</code>. Sem nenhuma tarifa, <code>cost</code> é <code>null</code>; com apenas uma, o total é parcial e <code>cost_complete</code> é falso. Consumo zero com tarifa configurada gera custo zero válido. Não há histórico de tarifas nem medidor físico de gás.</p>
+  </section>
+
+  <section class="card" aria-labelledby="write-title">
+    <h2 id="write-title">Controlar e configurar</h2>
+    <div class="endpoint"><span class="method post">POST</span><code class="path">/api/v1/temperature</code><p><code>{"target":38}</code> · Temperatura inteira de 35 a 50 °C, verificada por leitura do aquecedor.</p></div>
+    <div class="endpoint"><span class="method post">POST</span><code class="path">/api/v1/favorite</code><p><code>{"slot":1}</code> · Aplica a temperatura do favorito 1, 2 ou 3 pelo mesmo controlador confirmado.</p></div>
+    <div class="endpoint"><span class="method post">POST</span><code class="path">/api/v1/settings</code><p><code>{"gas_type":"GN","gas_tariff":0,"water_tariff":0}</code> · Todos os campos são obrigatórios. Gás GN ou GLP; tarifas de 0 a 100000.</p></div>
+    <div class="endpoint"><span class="method post">POST</span><code class="path">/api/v1/preferences</code><p>Substitui os três favoritos e as opções de aviso. Consulte o exemplo completo abaixo.</p></div>
+    <div class="endpoint"><span class="method post">POST</span><code class="path">/api/v1/control/cancel</code><p><code>{}</code> · Interrompe os próximos passos de um ajuste. Não desfaz um passo já transmitido.</p></div>
+    <div class="endpoint"><span class="method post">POST</span><code class="path">/api/v1/device/restart</code><p><code>{"confirm":true}</code> · Disponível após pelo menos 75 segundos desde o boot; antes disso retorna 503 com <code>not_ready</code>. Reinicia somente o ESP, após cerca de 500 ms. Durante uso de água ou ajuste em andamento, retorna 409. O limite aparece em <code>limits.restart_min_uptime_s</code> no <code>GET /capabilities</code>.</p></div>
+    <p class="hint">Após alterar tarifas ou preferências, consulte <code>GET /settings</code> para confirmar os valores persistidos. Não há comando HTTP de ligar/desligar o aquecedor nem envio serial arbitrário.</p>
+    <details><summary>Corpo completo de preferências</summary>
+      <pre><code>{
+  "favorites": [
+    {"name": "Banho", "temp_c": 38},
+    {"name": "Conforto", "temp_c": 39},
+    {"name": "Cozinha", "temp_c": 40}
+  ],
+  "alerts": {
+    "long_use_enabled": true,
+    "flow_enabled": true,
+    "error_enabled": true,
+    "offline_enabled": true,
+    "long_use_min": 15,
+    "continuous_flow_min": 20,
+    "offline_seconds": 30
+  }
+}</code></pre>
+      <p class="hint">Exatamente três favoritos; nome de até 31 bytes UTF-8 e temperatura de 35 a 50 °C. Todos os avisos e limites são obrigatórios. Limites de tempo: 1–180 minutos e 10–600 segundos sem resposta.</p>
+    </details>
+  </section>
+
+  <section class="card" aria-labelledby="example-title"><h2 id="example-title">Exemplo de ajuste</h2>
+    <p>Os exemplos abaixo são texto para seu cliente HTTP. Esta página não envia comandos.</p>
+    <pre><code>curl http://192.168.1.50/api/v1/state
+
+curl -X POST http://192.168.1.50/api/v1/temperature \
+  -H 'Content-Type: application/json' \
+  --data '{"target":38}'
+
+curl http://192.168.1.50/api/v1/control</code></pre>
+    <p>Guarde os identificadores da resposta aceita e acompanhe o controle até um resultado final. Só <code>confirmed</code> confirma o ajuste solicitado. Se <code>uncertain</code> for verdadeiro, um passo pode ter ocorrido sem confirmação. <code>cancel_requested</code> indica cancelamento ainda aguardando processamento.</p>
+    <p class="note">Não repita automaticamente um comando após timeout. Leia o estado atual e o resultado do pedido antes de decidir sobre um novo ajuste. Os identificadores se referem ao último pedido HTTP e ao boot indicado.</p>
+    <details><summary>Formato das amostras do histórico</summary><p>As colunas de cada linha de <code>samples</code> estão listadas em <code>sample_columns</code>:</p><pre><code>[age_s, inlet_c, outlet_c, flow_l_min, power_kw, heating]</code></pre><p class="hint">Intervalos de 120 segundos. Temperaturas em °C, vazão em L/min e potência em kW. Timestamps dos usos são segundos Unix; um início desconhecido permanece <code>null</code>. Gás e custos são estimativas.</p></details>
+  </section>
+
+  <section class="grid" aria-label="Integração e respostas">
+    <article class="card"><h2>Home Assistant e visor</h2><p>Para um visor próprio, use a API HTTP e respeite a atualidade de cada leitura.</p><p>A <strong>API nativa criptografada do ESPHome na porta 6053</strong> expõe o número <strong>Temperatura ajustada</strong>, a ação <code>ajustar_temperatura(target)</code> e os sensores.</p><p>Para o histórico por banho/acionamento, a integração opcional <strong>Rinnai Local</strong> consulta <code>/sessions</code> e mantém os registros em armazenamento persistente do Home Assistant, com calendário e consulta paginada. Não depende de MQTT.</p><p class="hint">As integrações são instaladas/configuradas no servidor HA. A API HTTP está aberta na rede local; esta documentação não publica o dispositivo na internet.</p><p><a href="/api/openapi.json" download="rinnai-openapi.json">Baixar o contrato OpenAPI</a></p></article>
+    <article class="card"><h2>Respostas e erros</h2><dl class="codes"><dt>200</dt><dd>Leitura disponível ou cancelamento sem ajuste ativo.</dd><dt>202</dt><dd>Pedido aceito para processamento.</dd><dt>400</dt><dd>JSON ou parâmetros inválidos.</dd><dt>403</dt><dd>Origem recusada.</dd><dt>404</dt><dd>Endpoint desconhecido.</dd><dt>405</dt><dd>Método não permitido.</dd><dt>408</dt><dd>Tempo esgotado ao receber o corpo.</dd><dt>409</dt><dd>Fila ocupada ou conflito com o estado atual.</dd><dt>413</dt><dd>Corpo maior que o permitido.</dd><dt>415</dt><dd>Tipo de conteúdo não suportado.</dd><dt>503</dt><dd>Módulo ou comunicação indisponível.</dd></dl><p class="hint">Erros incluem <code>error</code>, com mensagem legível, e <code>code</code>, para tratamento pelo cliente.</p></article>
+  </section>
+  <footer>API v1 · Rinnai REU-E211 · O painel existente continua usando os endpoints de compatibilidade em <code>/rinnai/api</code>.</footer>
+</main>
+</body>
+</html>

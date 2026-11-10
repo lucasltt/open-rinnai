@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Prévia · Rinnai</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="dashboard.css">
+  <script>
+    // Demonstration-only API. This file is never embedded in the ESP firmware.
+    window.__RINNAI_PREVIEW__ = true;
+    (() => {
+      const started = Date.now();
+      const responseMode = new URLSearchParams(location.search).get('response');
+      window.__RINNAI_PREVIEW_REQUESTS__ = [];
+      const settings = { gas_type: 'GN', gas_tariff: 0, water_tariff: 0,
+        favorites: [{ name: 'Banho', temp_c: 38 }, { name: 'Conforto', temp_c: 39 }, { name: 'Cozinha', temp_c: 40 }],
+        alerts: { long_use_enabled: true, flow_enabled: true, error_enabled: true, offline_enabled: true, long_use_min: 15, continuous_flow_min: 20, offline_seconds: 30 } };
+      const control = { busy: false, ready: true, status: 'Temperatura confirmada' };
+      let actual = 38, target = 38;
+      const zone = 'America/Sao_Paulo';
+      const day = new Intl.DateTimeFormat('sv-SE', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+      const midnight = new Date(`${day}T00:00:00-03:00`).getTime() / 1000;
+      const nowEpoch = Math.floor(Date.now() / 1000);
+      const recent = Array.from({ length: 24 }, (_, index) => {
+        const seconds = index % 4 === 0 ? 721 + index * 11 : index % 3 === 0 ? 65 + index : 310 + index * 13;
+        let end = index < 12 ? nowEpoch - (10 + index * 45) * 60 : midnight - (index - 12) * 55 * 60;
+        if (index === 12) end = midnight + 480;
+        if (index === 21) end = nowEpoch - 30 * 3600;
+        const dated = index < 22, start = index === 12 ? midnight - 120 : end - seconds;
+        const incomplete = index === 7 || index === 23;
+        return { sequence: 24 - index, age_s: dated ? nowEpoch - end : null, started_at_epoch_s: dated ? start : null,
+          ended_at_epoch_s: dated ? end : null, elapsed_s: index === 12 ? 600 : dated ? seconds : null,
+          duration_s: index === 12 ? 600 : seconds, water_l: seconds * 4.7 / 60,
+          energy_kwh: seconds * 5.72 / 3600, complete: !incomplete, end_reason: incomplete ? 'stale_flow' : 'flow_stop' };
+      }).sort((a, b) => (b.ended_at_epoch_s || 0) - (a.ended_at_epoch_s || 0));
+      function costs(value) {
+        const kcalPerUnit = settings.gas_type === 'GLP' ? 11500 : 9400;
+        const gas = value.energy_kwh * 860.42 / kcalPerUnit;
+        const gas_cost = settings.gas_tariff > 0 ? gas * settings.gas_tariff : null;
+        const water_cost = settings.water_tariff > 0 ? value.water_l / 1000 * settings.water_tariff : null;
+        return { ...value, gas, gas_cost, water_cost, cost: gas_cost !== null || water_cost !== null ? (gas_cost || 0) + (water_cost || 0) : null, cost_complete: settings.gas_tariff > 0 && settings.water_tariff > 0 };
+      }
+      function dayKey(date) { return Number(`${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`); }
+      function periods() {
+        const days = [];
+        for (let i = 6; i >= 0; --i) { const date = new Date(); date.setDate(date.getDate() - i); days.push(costs({ key: dayKey(date), water_l: 65 + (6 - i) * 12.5, energy_kwh: 1.12 + (6 - i) * .24, heating_s: 950 + (6 - i) * 120, sessions: 2 + (i % 3), partial: i === 6 || i === 0 })); }
+        const months = [costs({ key: Math.floor(dayKey(new Date()) / 100), water_l: 845.2, energy_kwh: 16.25, heating_s: 14500, sessions: 23, partial: true })];
+        return { days, months, clock_valid: true, tracked_since_epoch_s: Math.floor(Date.now() / 1000) - 6 * 86400, unassigned: { water_l: 0, energy_kwh: 0 } };
+      }
+      function diagnostics() {
+        const now = Math.floor(Date.now() / 1000);
+        return { boot_count: 4, crash_count: 1, last_reset_reason: 'Reinício solicitado', clock_valid: true, storage_ok: true,
+          boots: [{ sequence: 4, epoch_s: now - 7214, reason: 'Reinício solicitado', crash: false }, { sequence: 3, epoch_s: now - 40000, reason: 'Exceção do firmware', crash: true }, { sequence: 2, epoch_s: now - 86000, reason: 'Atualização OTA', crash: false }],
+          crash_log: 'DADOS DEMONSTRATIVOS\nRegistro de uma falha anterior para investigação.\nNenhum dado foi lido de um aquecedor real.', firmware_elf_sha256: 'firmware-de-demonstracao' };
+      }
+      function state() {
+        const seconds = Math.floor((Date.now() - started) / 1000);
+        const calendar = periods(), sessionSeconds = responseMode === 'alerts' ? 1400 + seconds : 180 + seconds;
+        const alerts = [];
+        if (settings.alerts.long_use_enabled && sessionSeconds >= settings.alerts.long_use_min * 60) alerts.push({ id: 'long_use', title: 'Banho longo', message: 'O uso atual passou do tempo configurado para banho.', severity: 'warning' });
+        if (settings.alerts.flow_enabled && sessionSeconds >= settings.alerts.continuous_flow_min * 60) alerts.push({ id: 'continuous_flow', title: 'Água circulando por muito tempo', message: 'A vazão permanece ativa além do limite configurado.', severity: 'warning' });
+        return {
+          version: '1.2.0 · prévia', online: true, heating: true,
+          inlet_c: 21.4, outlet_c: 38.1, setpoint_c: actual, target_c: target,
+          flow_l_min: 4.7, power_kcal_min: 82.1, power_kw: 5.72,
+          control: { ...control }, settings: JSON.parse(JSON.stringify(settings)), alerts,
+          readings: Object.fromEntries(['inlet', 'outlet', 'flow', 'power', 'setpoint', 'flame', 'error'].map((key, index) => [key, { age_s: index % 8 + 1, stale: false }])),
+          periods: { clock_valid: calendar.clock_valid, tracked_since_epoch_s: calendar.tracked_since_epoch_s, today: calendar.days[calendar.days.length - 1], month: calendar.months[0], unassigned: calendar.unassigned },
+          session: costs({ active: true, sequence: 25, started_at_epoch_s: nowEpoch - 180, elapsed_s: sessionSeconds, duration_s: sessionSeconds, water_l: 14.1 + seconds * 4.7 / 60, energy_kwh: 0.286 + seconds * 5.72 / 3600 }),
+          totals: costs({ water_l: 146.2 + seconds * 4.7 / 60, energy_kwh: 2.85 + seconds * 5.72 / 3600, heating_s: 1800 + seconds, sessions: 24 }),
+          diag: { rssi_dbm: -57, heap_bytes: 221360, uptime_s: 7214 + seconds, latency_ms: 124, valid_frames: 3510 + seconds, timeouts: 0, bad_frames: 0, error_code: 0, last_seen_age_s: 1, setpoint_age_s: 1, session_history_persists: true, storage_ok: true }
+        };
+      }
+      function history() {
+        const samples = [];
+        for (let i = 719; i >= 0; i--) {
+          const age_s = i * 120;
+          const absolute = nowEpoch - age_s;
+          const heating = recent.some(item => item.started_at_epoch_s && absolute >= item.started_at_epoch_s - 120 && absolute <= item.ended_at_epoch_s);
+          const paused = i >= 350 && i <= 355;
+          samples.push([age_s, paused ? null : 21.3 + Math.sin(i / 21) * .45, paused ? null : 22.1 + (heating ? 15.8 : 0) + Math.sin(i / 8) * .22,
+            paused ? null : heating ? 4.7 + Math.sin(i / 12) * .1 : 0,
+            paused ? null : heating ? 5.7 + Math.sin(i / 13) * .25 : 0, paused ? null : heating]);
+        }
+        return { samples, sessions: recent.map(costs), sessions_persisted: true, total_sessions: 24, session_capacity: 24, window_s: 86400, point_interval_s: 120 };
+      }
+      window.fetch = async (url, options = {}) => {
+        const path = String(url).split('?')[0];
+        let payload, status = 200;
+        if (path.endsWith('/state')) payload = state();
+        else if (path.endsWith('/history')) payload = history();
+        else if (path.endsWith('/periods')) payload = periods();
+        else if (path.endsWith('/diagnostics')) payload = diagnostics();
+        else if (path.endsWith('/temperature')) {
+          window.__RINNAI_PREVIEW_REQUESTS__.push({ path, body: options.body });
+          const desired = Number(new URLSearchParams(options.body).get('target'));
+          if (!Number.isInteger(desired) || desired < 35 || desired > 50) { status = 400; payload = { error: 'Escolha uma temperatura entre 35 e 50 °C.' }; }
+          else if (control.busy) { status = 409; payload = { error: 'Um ajuste já está em andamento.' }; }
+          else {
+            status = 202; target = desired; control.busy = true; control.status = 'Ajustando e consultando o aquecedor…'; payload = { accepted: true };
+            setTimeout(() => { actual = desired; control.busy = false; control.status = 'Temperatura confirmada'; }, 2600);
+          }
+        } else if (path.endsWith('/preferences')) {
+          const form = new URLSearchParams(options.body);
+          const favorites = [1, 2, 3].map(i => ({ name: String(form.get(`favorite${i}_name`) || '').trim(), temp_c: Number(form.get(`favorite${i}_temp`)) }));
+          if (favorites.some(item => !item.name || new TextEncoder().encode(item.name).length > 31 || !Number.isInteger(item.temp_c) || item.temp_c < 35 || item.temp_c > 50)) { status = 400; payload = { error: 'Confira nomes e temperaturas.' }; }
+          else {
+            settings.favorites = favorites;
+            settings.alerts = { long_use_enabled: form.get('long_use_enabled') === '1', flow_enabled: form.get('flow_enabled') === '1', error_enabled: form.get('error_enabled') === '1', offline_enabled: form.get('offline_enabled') === '1', long_use_min: Number(form.get('long_use_min')), continuous_flow_min: Number(form.get('continuous_flow_min')), offline_seconds: Number(form.get('offline_seconds')) };
+            payload = { accepted: true }; status = 202;
+          }
+        } else if (path.endsWith('/settings')) {
+          const form = new URLSearchParams(options.body);
+          settings.gas_type = form.get('gas_type') === 'GLP' ? 'GLP' : 'GN';
+          settings.gas_tariff = Number(form.get('gas_tariff')) || 0;
+          settings.water_tariff = Number(form.get('water_tariff')) || 0;
+          payload = { saved: true };
+        } else { status = 404; payload = { error: 'Recurso não encontrado.' }; }
+        await new Promise(resolve => setTimeout(resolve, 90));
+        if (status === 202 && path.endsWith('/temperature')) {
+          if (responseMode === 'lost') throw new TypeError('Simulated lost HTTP response');
+          if (responseMode === 'invalid') return new Response('invalid JSON', { status: 202 });
+        }
+        return new Response(JSON.stringify(payload), { status, headers: { 'Content-Type': 'application/json' } });
+      };
+    })();
+  </script>
+  <script defer src="dashboard.js"></script>
+</head>
+<body></body>
+</html>

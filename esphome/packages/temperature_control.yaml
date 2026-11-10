@@ -1,0 +1,77 @@
+esphome:
+  on_boot:
+    - priority: -120
+      then:
+        - lambda: |-
+            rinnai_telemetry::set_on_reading([](const rinnai_telemetry::Reading &reading) {
+              rinnai_smart::observe_reading(reading);
+              if (reading.address == 0x060E && rinnai_smart::controller.actual_celsius() >= 35)
+                id(rinnai_target_temperature).publish_state(rinnai_smart::controller.actual_celsius());
+            });
+
+number:
+  - platform: template
+    name: Temperatura ajustada
+    id: rinnai_target_temperature
+    unit_of_measurement: "°C"
+    min_value: 35
+    max_value: 50
+    step: 1
+    update_interval: never
+    set_action:
+      - lambda: |-
+          if (!std::isfinite(x) || x != std::floor(x) || x < 35 || x > 50) return;
+          rinnai_smart::controller.target_request(static_cast<int>(x), millis());
+          rinnai_telemetry::set_background_paused(rinnai_smart::controller.busy());
+
+api:
+  actions:
+    - action: ajustar_temperatura
+      variables:
+        target: int
+      then:
+        - lambda: |-
+            rinnai_smart::controller.target_request(target, millis());
+            rinnai_telemetry::set_background_paused(rinnai_smart::controller.busy());
+
+text_sensor:
+  - platform: template
+    name: Estado do ajuste de temperatura
+    id: rinnai_control_status
+    entity_category: diagnostic
+    update_interval: 500ms
+    lambda: return {rinnai_smart::controller.status()};
+
+binary_sensor:
+  - platform: template
+    name: Ajuste de temperatura em andamento
+    id: rinnai_control_busy
+    entity_category: diagnostic
+    lambda: return rinnai_smart::controller.busy();
+
+interval:
+  - id: !extend rinnai_background_poll
+    interval: 1s
+  - interval: 100ms
+    then:
+      - lambda: |-
+          const uint32_t now = millis();
+          const bool error_known = id(rinnai_error_code).has_state() && std::isfinite(id(rinnai_error_code).state);
+          const uint32_t last_valid = rinnai_telemetry::last_valid_ms();
+          rinnai_smart::controller.update_observation(last_valid != 0 && now - last_valid < 15000U,
+              error_known, error_known ? static_cast<uint16_t>(id(rinnai_error_code).state) : 0,
+              last_valid, rinnai_telemetry::last_seen(0x0614));
+          rinnai_smart::controller.tick(now);
+          rinnai_telemetry::set_background_paused(rinnai_smart::controller.busy());
+          if (!rinnai_smart::controller.busy() || rinnai_telemetry::pending()) return;
+          const auto action = rinnai_smart::controller.next_action(now);
+          if (action.kind == rinnai_control::Kind::NONE) return;
+          std::string result;
+          if (action.kind == rinnai_control::Kind::QUERY_INDEX) {
+            rinnai_telemetry::request_started(0x060E);
+            result = rinnai_read_query::run_register(0, 0x060E);
+          } else {
+            result = rinnai_read_query::run_step(0, action.kind == rinnai_control::Kind::INCREMENT);
+          }
+          ESP_LOGI("rinnai.control", "%s", result.c_str());
+          rinnai_smart::controller.on_sent(action, result.rfind("OK", 0) == 0, millis());

@@ -1,0 +1,39 @@
+{
+  "fixture_only": true,
+  "live_heater_contacted": false,
+  "displayed_values": "Demonstration data from esphome/dashboard/preview.html; tariffs are example values only.",
+  "sensitive_network_identifiers": false,
+  "captured_utc": "2026-10-27T21:38:41.863054+00:00",
+  "browser": "Microsoft Edge",
+  "device_scale_factor": 1,
+  "images": [
+    {
+      "file": "dashboard-desktop.png",
+      "width": 1440,
+      "height": 985,
+      "bytes": 160897,
+      "sha256": "5421a979024eb9cbd0208a950e3a2de8af29fdffc560a18b06eca96610363e79"
+    },
+    {
+      "file": "dashboard-mobile.png",
+      "width": 390,
+      "height": 1456,
+      "bytes": 132767,
+      "sha256": "f818456972a98b4b92318e88b3d09efadeecb6c68373fd5ceef5e355037cb72d"
+    },
+    {
+      "file": "daily-history.png",
+      "width": 1193,
+      "height": 1079,
+      "bytes": 107366,
+      "sha256": "68384283cc6db6073f76ec48298d88260359da046999f13f877496b1ac185076"
+    }
+  ],
+  "reproduce": [
+    "Serve esphome/dashboard on loopback with python -m http.server 14083 --bind 127.0.0.1 --directory esphome/dashboard",
+    "Open http://127.0.0.1:14083/preview.html in Playwright CLI Edge",
+    "Set demo tariffs via the local mocked settings form; gas 1.69, water 5.63",
+    "Capture 1440px desktop and 390px mobile from the page top through the consumption section",
+    "For the daily view select two usages, add a demonstration label to the screenshot region, then capture the first 1080px of the daily card"
+  ]
+}

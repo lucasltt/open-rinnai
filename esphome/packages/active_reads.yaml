@@ -1,0 +1,84 @@
+# No on_boot/interval transmission. Arm is volatile, single-use, expires in 120 s.
+globals:
+  - id: rinnai_read_arm_until
+    type: uint32_t
+    restore_value: false
+    initial_value: '0'
+  - id: rinnai_read_last_attempt
+    type: uint32_t
+    restore_value: false
+    initial_value: '0'
+
+esphome:
+  on_boot:
+    - priority: -110
+      then:
+        - lambda: |-
+            id(rinnai_interface_inspection).publish_state(rinnai_read_query::describe());
+
+api:
+  actions:
+    - action: inspecionar_interface
+      then:
+        - lambda: |-
+            id(rinnai_interface_inspection).publish_state(rinnai_read_query::describe());
+    - action: armar_consultas_temperatura
+      variables:
+        series_1k_installed: bool
+      then:
+        - lambda: |-
+            id(rinnai_read_arm_until) = series_1k_installed ? millis() + 120000U : 0U;
+            id(rinnai_read_arm_state).publish_state(series_1k_installed ?
+                "Armado por 120 s; resistores serie confirmados pelo operador" : "Desarmado");
+    - action: consultar_temperatura_uma_vez
+      variables:
+        tx_line: int
+        inlet: bool
+      then:
+        - lambda: |-
+            const uint32_t now = millis();
+            if (id(rinnai_read_arm_until) == 0 ||
+                static_cast<int32_t>(id(rinnai_read_arm_until) - now) <= 0) {
+              id(rinnai_read_last_result).publish_state("Bloqueado: consultas desarmadas");
+              return;
+            }
+            if (tx_line != 1 && tx_line != 2) {
+              id(rinnai_read_last_result).publish_state("Bloqueado: canal deve ser 1 ou 2");
+              return;
+            }
+            if (id(rinnai_read_last_attempt) != 0 && now - id(rinnai_read_last_attempt) < 3000U) {
+              id(rinnai_read_last_result).publish_state("Bloqueado: intervalo minimo 3 s");
+              return;
+            }
+            id(rinnai_read_arm_until) = 0U;
+            id(rinnai_read_arm_state).publish_state("Desarmado: gatilho unico consumido");
+            if (!rinnai_rx::configure(id(rinnai_pin1_rx), id(rinnai_pin2_rx), 9600, false, 0, 1)) {
+              id(rinnai_read_last_result).publish_state("Bloqueado: falha ao configurar UART");
+              return;
+            }
+            id(rinnai_rx_settings).publish_state("9600 8N1 normal");
+            id(rinnai_read_last_attempt) = millis();
+            const std::string result = rinnai_read_query::run(static_cast<size_t>(tx_line - 1), inlet);
+            id(rinnai_read_last_result).publish_state(result);
+
+text_sensor:
+  - platform: template
+    name: Inspecao da interface
+    id: rinnai_interface_inspection
+    entity_category: diagnostic
+    update_interval: never
+  - platform: template
+    name: Estado consultas ativas
+    id: rinnai_read_arm_state
+    entity_category: diagnostic
+    update_interval: 2s
+    lambda: |-
+      if (id(rinnai_read_arm_until) == 0 ||
+          static_cast<int32_t>(id(rinnai_read_arm_until) - millis()) <= 0)
+        return {"Desarmado"};
+      return {"Armado para uma consulta; somente 0604 ou 0606"};
+  - platform: template
+    name: Ultimo teste de consulta
+    id: rinnai_read_last_result
+    entity_category: diagnostic
+    update_interval: never
