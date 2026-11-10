@@ -29,7 +29,9 @@ Não há orçamento em R$ nesta BOM: preços, estoque e modelos de módulos vari
 
 ## Pinos do conector do aquecedor
 
-**P1 a P4 são rótulos provisórios deste projeto**, na ordem de cima para baixo relatada na montagem original. Não há foto que fixe a orientação de observação, nem identificação da numeração pelo fabricante. Não reproduza a ordem apenas olhando o desenho: confirme o conector no aparelho.
+O README inclui uma [foto de referência do ponto serial B](../README.md#onde-fica-o-conector), extraída do manual oficial ROU003/ROU0031 para localizar a conexão usada pela família E17/E21.
+
+**P1 a P4 são rótulos provisórios deste projeto**, na ordem de cima para baixo relatada na montagem original. A foto não determina a ordem desses contatos, sua numeração oficial ou a revisão da placa. Não reproduza a ordem apenas olhando o desenho: confirme os pinos no aparelho.
 
 | Rótulo do projeto | Medição DC em repouso, relativa a GND | Função no protótipo | Ligação |
 |---|---:|---|---|

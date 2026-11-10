@@ -1,0 +1,15 @@
+Créditos de material de terceiros
+
+docs/images/connector-location-rinnai-e211.png
+
+Fotografia pertencente à Rinnai Brasil Tecnologia de Aquecimento Ltda.
+Recorte da foto B da seção 3.1, página 4 do PDF do Manual de Instruções e
+Instalação do Módulo Controlador WiFi ROU003/ROU0031, com a seta original
+preservada. Usada como referência visual para localizar a conexão serial.
+
+Fonte: https://www.rinnai.com.br/uploads/manual/203.pdf#page=4
+Consultada em 10/11/2026. A tabela da página 2 associa o REU-E211FEH ao ponto B.
+
+Essa fotografia não é abrangida pela licença MIT do projeto. Os direitos
+sobre a imagem permanecem com seu titular; sua inclusão não concede uma
+licença de reutilização em nome da Rinnai nem indica vínculo com o fabricante.

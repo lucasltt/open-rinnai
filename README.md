@@ -110,9 +110,17 @@ Veja [hardware e BOM detalhados](docs/HARDWARE.md).
 
 [Abrir diagrama vetorial em SVG](docs/images/wiring-diagram.svg)
 
+### Onde fica o conector
+
+O [manual oficial ROU003/ROU0031, página 2](https://www.rinnai.com.br/uploads/manual/203.pdf#page=2) associa o **REU-E211FEH** ao **ponto serial B**. A seta B na foto de referência abaixo indica a conexão da placa onde é ligado o cabo do módulo Wi-Fi original.
+
+![Foto de referência do interior do aquecedor, com a seta B indicando a conexão serial na placa](docs/images/connector-location-rinnai-e211.png)
+
+*Foto: Rinnai. Recorte da seção 3.1, [página 4 do manual oficial](https://www.rinnai.com.br/uploads/manual/203.pdf#page=4), com a seta original preservada. [Créditos da imagem](NOTICE).*
+
 ### Identificação do conector do aquecedor
 
-**P1, P2, P3 e P4 são nomes provisórios deste projeto**, seguindo a ordem de cima para baixo relatada no protótipo. Não há foto que fixe a orientação de observação nem numeração oficial confirmada. O desenho é funcional: não o use como orientação mecânica de encaixe sem identificar os pinos no seu aparelho.
+**P1, P2, P3 e P4 são nomes provisórios deste projeto**, seguindo a ordem de cima para baixo relatada no protótipo. A foto de referência não determina a ordem desses contatos, sua numeração oficial ou a revisão da placa. O desenho é funcional: confirme os pinos no seu aparelho antes de conectar.
 
 | Rótulo | Medição DC relativa a GND | Função confirmada / observada |
 |---|---:|---|
@@ -474,22 +482,6 @@ python -m http.server 8080 --bind 127.0.0.1 --directory esphome/dashboard
 
 Abra **`http://127.0.0.1:8080/preview.html`**. A prévia usa dados e respostas simulados e é identificada como demonstrativa; não controla um ESP real. As capturas deste README foram geradas dessa página.
 
-### Verificações locais
-
-```sh
-# Assets/PWA e documentação, sem acesso ao dispositivo:
-python analysis/embed_pwa_assets.py
-python analysis/embed_api_assets.py
-python analysis/check_api_v1_http.py --validate-local
-
-# Inspetor serial offline:
-python -m unittest discover -s analysis -p test_protocol_inspector.py
-```
-
-Os testes C++ cobrem parser, controlador, estatísticas, persistência, migração, períodos, preferências e API. O runner [run_api_backend_test.py](analysis/run_api_backend_test.py) é específico da bancada Windows/Zig: requer Zig 0.12.1 no caminho indicado pelo script e os headers ArduinoJson obtidos no build ESPHome. Ele extrai a classe real do backend para um adaptador HTTP de host. Os binários de ferramentas não são distribuídos.
-
-Na referência 1.1.0, a API passou em 618 verificações de requisições, 43 do acompanhamento de comandos e 560 do backend, além das suítes de controle/telemetria/armazenamento. A interface foi verificada em celular e desktop; o service worker possui verificações de integridade, cache e exclusão de comandos da fila offline.
-
 ### Conferência de um ESP instalado
 
 ```sh
@@ -529,7 +521,9 @@ O diagnóstico preserva a identidade do firmware associado ao último crash disp
 
 O código e a documentação próprios deste projeto estão sob a **[licença MIT](LICENSE)**. É permitido usar, modificar e redistribuir, inclusive comercialmente, preservando o aviso de autoria e o texto da licença. O software é fornecido sem garantia, conforme o arquivo `LICENSE`. Dependências de terceiros mantêm suas respectivas licenças.
 
-Rinnai e ESPHome são nomes de seus respectivos projetos/titulares. As capturas e os diagramas deste repositório documentam a implementação independente; não são imagens oficiais de ligação do fabricante.
+A fotografia do conector pertence à Rinnai e está identificada no [arquivo de créditos](NOTICE); ela não é abrangida pela licença MIT do projeto.
+
+Rinnai e ESPHome são nomes de seus respectivos projetos/titulares. As capturas do painel e os diagramas deste repositório documentam a implementação independente; não são imagens oficiais de ligação do fabricante.
 
 ## Referências
 

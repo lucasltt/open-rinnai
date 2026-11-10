@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "passed": true,
-  "source_files": 109,
-  "source_bytes": 2177509,
+  "source_files": 111,
+  "source_bytes": 2480977,
   "files": [
     {
       "path": ".gitignore",
@@ -15,9 +15,14 @@
       "sha256": "e204eba7bc37f6150eff8809b96d5edc1690fda512dec9d563e54fcca6550cfd"
     },
     {
+      "path": "NOTICE",
+      "bytes": 768,
+      "sha256": "02ad8b334273fb1b52eef9338c6ee357fae528092dc1dee3026dc0df74400abc"
+    },
+    {
       "path": "README.md",
-      "bytes": 36701,
-      "sha256": "05c07480d15536b3cb4a19e715ef71ad9cc1ccf5a977cf4d3437d0b2873dd077"
+      "bytes": 36377,
+      "sha256": "9e81861011fe235bd7f716e873cca96025f997f910a0c0e2fa0acbadf6afd24a"
     },
     {
       "path": "analysis/build_pwa_assets.py",
@@ -151,8 +156,8 @@
     },
     {
       "path": "docs/HARDWARE.md",
-      "bytes": 6642,
-      "sha256": "d26dd27e39070a6d6dc614616fcbe9ef3095c675581c0650d8d2ff293aea7b92"
+      "bytes": 6823,
+      "sha256": "85003444da0da6b9156c89b991170c599e43341c19c77fcc1dbd59a54db03b5a"
     },
     {
       "path": "docs/images/architecture.png",
@@ -163,6 +168,11 @@
       "path": "docs/images/architecture.svg",
       "bytes": 7260,
       "sha256": "676aa06baf6ff51103aed88ee35fee914b9277f55e1cd5985a01bce4128d53fd"
+    },
+    {
+      "path": "docs/images/connector-location-rinnai-e211.png",
+      "bytes": 302843,
+      "sha256": "f6cc217a32b4c1a37df4cb3edf6bfc3f94b95fea19c0fd40ee56852738d4b6f0"
     },
     {
       "path": "docs/images/daily-history.png",
